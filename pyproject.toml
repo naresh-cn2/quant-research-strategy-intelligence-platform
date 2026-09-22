@@ -1,0 +1,101 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qrsip"
+version = "0.1.0"
+description = "Research-grade quantitative strategy intelligence platform for deterministic experiments, risk analysis, robustness validation, and auditable strategy research."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Proprietary" }
+authors = [{ name = "P02 Implementation Agent" }]
+keywords = ["quantitative-research", "backtesting", "reproducibility", "risk"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Office/Business :: Financial",
+]
+dependencies = [
+    "pydantic>=2.5,<3",
+    "PyYAML>=6.0,<7",
+    "numpy>=1.26,<3",
+    "pandas>=2.1,<3",
+    "pyarrow>=14,<22",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0,<9",
+    "pytest-cov>=4.1,<6",
+    "ruff>=0.4,<1",
+    "mypy>=1.8,<2",
+    "types-PyYAML>=6.0,<7",
+    "bandit>=1.7,<2",
+    "pip-audit>=2.6,<3",
+]
+
+[project.scripts]
+qrsip = "qrsip.cli:main"
+
+[project.urls]
+Repository = "https://github.com/naresh-cn2/quant-research-strategy-intelligence-platform"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+qrsip = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "adversarial: tests that deliberately attempt to break the system",
+    "acceptance: end-to-end acceptance tests",
+    "contract: tests against external contracts (P01)",
+    "integration: cross-module integration tests",
+    "property: invariant/property-based tests",
+    "regression: regression tests for fixed defects",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF"]
+ignore = ["E501", "N801", "N802", "UP036"]
+# NOTE: N801/N802 are intentionally ignored repo-wide:
+# TimedEvent is canonical and timed_event is kept as a
+# backward-compatible lowercase factory.
+# UP036 is intentionally ignored: doctor.py contains an explicit runtime
+# guard comparing sys.version_info against a manifest minimum.
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*" = ["S101"]
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = "src"
+packages = ["qrsip"]
+strict = true
+warn_unreachable = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = ["pandas", "pyarrow"]
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["src/qrsip"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 80
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv"]

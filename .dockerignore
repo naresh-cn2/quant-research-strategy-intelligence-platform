@@ -1,0 +1,38 @@
+# QRSIP — .dockerignore
+#
+# Keep the Docker build context small and deterministic.
+#
+# We do NOT ship raw data, virtual environments, build artifacts,
+# IDE state, or local secrets into the image.
+
+.venv/
+.env
+.env.*
+!.env.example
+*.pyc
+__pycache__/
+*.egg-info/
+src/qrsip.egg-info/
+build/
+dist/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage.xml
+.tox/
+.nox/
+node_modules/
+data/raw/
+data/staged/
+data/curated/
+artifacts/
+*.log
+*.bak
+*.swp
+.DS_Store
+Thumbs.db
+.git/
+.github/

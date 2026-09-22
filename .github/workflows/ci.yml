@@ -1,0 +1,79 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - "feature/**"
+      - "fix/**"
+      - "research/**"
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Free-threaded / build sanity
+        run: python -c "import qrsip; print(qrsip.__version__)"
+
+      - name: Security scan (bandit)
+        run: bandit -r src -c pyproject.toml -ll
+
+      - name: Dependency audit
+        run: pip-audit -r requirements-frozen.txt || true
+
+      - name: Format check
+        run: ruff format --check src tests
+
+      - name: Lint
+        run: ruff check src tests
+
+      - name: Type check
+        run: mypy src
+
+      - name: Unit tests
+        run: pytest -v
+
+      - name: Integration tests
+        run: pytest -v -m integration
+
+      - name: Contract tests
+        run: pytest -v -m contract
+
+      - name: Property tests
+        run: pytest -v -m property
+
+      - name: Regression tests
+        run: pytest -v -m regression
+
+      - name: Adversarial tests
+        run: pytest -v -m adversarial
+
+      - name: Build wheel
+        run: python -m build --outdir dist
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: qrsip-build-${{ matrix.python-version }}
+          path: dist/
+          retention-days: 7

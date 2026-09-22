@@ -1,0 +1,18 @@
+services:
+  qrsip:
+    build: .
+    image: qrsip:dev
+    working_dir: /app
+    # Mount the repo for local iteration; data + reports stay local.
+    volumes:
+      - .:/app
+      - ./data:/app/data
+      - ./reports:/app/reports
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+    # Default: interactive shell. Override per task:
+    #   docker compose run --rm qrsip make ci
+    #   docker compose run --rm qrsip qrsip doctor
+    entrypoint: ["/bin/bash"]
+    command: ["-lc", "exec \"$@\"", "bash"]
