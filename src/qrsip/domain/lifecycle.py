@@ -97,7 +97,9 @@ def require_transition(current: ResearchLifecycleState, target: ResearchLifecycl
     cannot move at all (spec §14: no state may be skipped).
     """
     if current == target:
-        raise LifecycleViolation("no-op transition is not a state change", current=current, target=target)
+        raise LifecycleViolation(
+            "no-op transition is not a state change", current=current, target=target
+        )
     if not can_transition(current, target):
         allowed = sorted(state.value for state in _ALLOWED[current])
         raise LifecycleViolation(

@@ -97,9 +97,7 @@ class ResearchRegistry:
         """Load a single entity or fail closed."""
         key = self._key(entity_cls, entity_id, version)
         if not self._storage.exists(key):
-            raise RegistryError(
-                "entity not found", key=key, entity_id=entity_id, version=version
-            )
+            raise RegistryError("entity not found", key=key, entity_id=entity_id, version=version)
         return entity_cls.model_validate(self._storage.read_json(key))  # type: ignore[attr-defined]
 
     def list_ids(self, entity_cls: type[BaseModel]) -> list[str]:

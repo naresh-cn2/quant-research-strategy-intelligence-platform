@@ -107,6 +107,8 @@ def _validate_key(key: str) -> str:
     if any(part in {"", ".", ".."} for part in parts):
         raise StorageError("storage key contains an invalid segment", key=key)
     return "/".join(parts)
+
+
 class FileStorage:
     """Deterministic, portable, file-backed :class:`StoragePort` implementation.
 

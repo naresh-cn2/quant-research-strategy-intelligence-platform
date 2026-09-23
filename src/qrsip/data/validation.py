@@ -135,7 +135,9 @@ def _as_number(value: Any, field: str, index: int) -> float:
     try:
         number = float(value)
     except (TypeError, ValueError) as exc:
-        raise SchemaError("field is not numeric", field=field, row_index=index, value=value) from exc
+        raise SchemaError(
+            "field is not numeric", field=field, row_index=index, value=value
+        ) from exc
     if math.isnan(number) or math.isinf(number):
         raise SchemaError("field must be finite", field=field, row_index=index, value=value)
     return number

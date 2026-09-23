@@ -316,9 +316,7 @@ class PointInTimeView:
             dataset_checksum=self._dataset.checksum,
             is_fixture=self._dataset.is_fixture,
             bars_by_instrument={name: len(bars) for name, bars in history.items()},
-            last_close={
-                name: bars[-1].close for name, bars in history.items() if bars
-            },
+            last_close={name: bars[-1].close for name, bars in history.items() if bars},
         )
 
     def __repr__(self) -> str:

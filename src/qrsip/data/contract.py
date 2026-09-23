@@ -35,7 +35,15 @@ __all__ = [
     "SchemaError",
 ]
 
-OHLCV_FIELDS: tuple[str, ...] = ("timestamp", "instrument", "open", "high", "low", "close", "volume")
+OHLCV_FIELDS: tuple[str, ...] = (
+    "timestamp",
+    "instrument",
+    "open",
+    "high",
+    "low",
+    "close",
+    "volume",
+)
 
 
 class SchemaError(QRSIPError):
