@@ -8,13 +8,13 @@
 # P02 — Quantitative Research & Strategy Intelligence Platform
 # ============================================================
 
-**Status:** IN PROGRESS — NOT COMPLETE (Phases 0–3 Complete & Tested; Phase 4 & 5 WIP)
+**Status:** IN PROGRESS — NOT COMPLETE (Phases 0–4 Complete & Tested; Phase 5 WIP)
 
-**Current Phase:** Phase 4 (Simulation) & Phase 5 (Validation) — In Progress
+**Current Phase:** Phase 5 (Validation) — In Progress
 
-**Last Verified Commit:** `bd890d3` ("Phase 3: L3 quant layer — causal features, deterministic signals, fail-closed metrics")
+**Last Verified Baseline Commit:** `e4f45e6` ("docs: synchronize P02 architecture and project status")
 
-**Last Verification Timestamp:** 2026-09-23
+**Last Verification Timestamp:** 2026-09-24
 
 ---
 
@@ -41,12 +41,12 @@
 | **L3 Quant** | Causal Features (`features.py`) | **Implemented** | **Tested** (part of quant) | SMA, EMA, simple/log returns, rolling volatility, momentum; warm-up is `None` |
 | | Strategy Signals (`signals.py`) | **Implemented** | **Tested** (part of quant) | `SignalStrategy` protocol, `MovingAverageCrossStrategy`, `ConstantStrategy` |
 | | Financial Metrics (`metrics.py`) | **Implemented** | **Tested** (part of quant) | Sharpe, Sortino, Calmar, Max Drawdown, Win Rate, Profit Factor, `PerformanceMetrics` |
-| **L4 Simulation** | Execution Model (`execution.py`) | **WIP (untracked)** | **Missing** | Orders, fills at next-bar open $T+1$ (ADR-0005), commission + slippage cost model |
-| | Portfolio Accounting (`portfolio.py`)| **WIP (untracked)** | **Missing** | Double-entry accounting, verified equity invariant; unmarked valuation fails closed |
-| | Risk Engine (`risk.py`) | **WIP (untracked)** | **Missing** | Pre-trade order limits (notional, position, gross exposure), drawdown circuit breaker |
-| | Event-Loop Engine (`engine.py`) | **Missing** | **Missing** | `run_simulation` deterministic loop connecting dataset, signals, risk, execution, portfolio |
-| | Module Entrypoint (`__init__.py`) | **Broken** | **Missing** | Contains invalid import (`qrsip.dirty_exec`) and references unauthored `engine.py` |
-| **L5 Validation** | Validation Math (`stats.py`) | **WIP (untracked)** | **Missing** | t-statistic, normal approximation p-value, skewness, kurtosis, Deflated Sharpe Ratio |
+| **L4 Simulation** | Execution Model (`execution.py`) | **Implemented** | **Tested** (simulation suite) | Orders, fills at next-bar open $T+1$ (ADR-0005), commission + slippage cost model |
+| | Portfolio Accounting (`portfolio.py`)| **Implemented** | **Tested** (simulation suite) | Double-entry accounting, verified equity invariant; unmarked valuation fails closed |
+| | Risk Engine (`risk.py`) | **Implemented** | **Tested** (simulation suite) | Pre-trade order limits (notional, position, gross exposure), drawdown circuit breaker |
+| | Event-Loop Engine (`engine.py`) | **Implemented** | **Tested** (simulation suite) | `run_simulation` deterministic loop connecting dataset, signals, risk, execution, portfolio |
+| | Module Entrypoint (`__init__.py`) | **Implemented** | **Import smoke-tested** | Clean package exports for the simulation layer |
+| **L5 Validation** | Validation Math (`stats.py`) | **Implemented** | **Dedicated tests pending** | t-statistic, normal approximation p-value, skewness, kurtosis, Deflated Sharpe Ratio |
 | | Validation Runner & Bias Checks | **Missing** | **Missing** | Look-ahead bias verification, multiple-testing correction, survivorship check |
 | | Robustness Suite | **Missing** | **Missing** | Parameter sensitivity grid, walk-forward analysis, perturbation testing |
 | **L6 Intelligence** | Research Report Generator | **Partial** | **Missing** | Domain entities defined in `results.py`; Markdown/JSON report synthesis engine missing |
@@ -61,7 +61,7 @@
 
 ## 2. Test Suite & Verification Status
 
-* **Total Automated Tests Passing:** **272** (in 1.54s via Python 3.12 / pytest 8.4.2)
+* **Total Automated Tests Passing:** **307** (in 0.98s via Python 3.12 / pytest 8.4.2)
 * **Unit Test Breakdown by Suite:**
   * `tests/unit/test_cli.py`: 10 passed
   * `tests/unit/test_config.py`: 31 passed
@@ -71,6 +71,7 @@
   * `tests/unit/test_errors.py`: 16 passed
   * `tests/unit/test_logging.py`: 11 passed
   * `tests/unit/test_quant.py`: 64 passed
+  * `tests/unit/test_simulation.py`: 35 passed
 * **Higher-Order Test Suites (Status: SKELETON ONLY — 0 tests written yet):**
   * `tests/contract/`: SKELETON (only `README.md`)
   * `tests/property/`: SKELETON (only `README.md`)
@@ -79,35 +80,30 @@
   * `tests/acceptance/`: SKELETON (only `README.md`)
   * `tests/regression/`: SKELETON (only `README.md`)
 * **Linter & Formatter Status:**
-  * `ruff check src tests`: Clean (0 errors) on committed files.
-  * `ruff format --check src tests`: 2 untracked files (`simulation/portfolio.py`, `simulation/risk.py`) need formatting.
+  * `ruff format --check src tests`: Clean (48 files).
+  * `ruff check src tests`: Clean (0 errors).
 * **Type Checking Status:**
-  * `mypy src`: Passing on all committed code (19 source files).
-  * 3 errors currently reported on untracked WIP files:
-    1. `src/qrsip/validation/stats.py:79`: `Returning Any from function declared to return "float"` (type annotation on fractional power).
-    2. `src/qrsip/simulation/__init__.py:19`: `Cannot find implementation or library stub for module named "qrsip.dirty_exec"`.
-    3. `src/qrsip/simulation/__init__.py:20`: `Cannot find implementation or library stub for module named "qrsip.simulation.engine"`.
+  * `mypy src`: Passing on all 30 source files.
 * **Security Audit Status:**
-  * `bandit -r src -c pyproject.toml -ll`: Passing (0 medium/high issues across 3,503 LOC).
+  * `bandit -r src -c pyproject.toml -ll`: Passing (0 medium/high issues across 3,879 LOC).
 
 ---
 
-## 3. Explicit Inventory of Current Work-in-Progress (WIP)
+## 3. Implementation Inventory and Remaining WIP
 
-### L4 Simulation Layer (`src/qrsip/simulation/` — untracked in working directory)
-1. `src/qrsip/simulation/execution.py` (215 LOC): Implemented orders, next-bar open fills (ADR-0005), and explicit cost model (commissions + embedded slippage). Untracked.
-2. `src/qrsip/simulation/portfolio.py` (245 LOC): Implemented cash-first double-entry accounting enforcing the verified equity invariant ($\text{equity} = \text{cash} + \text{realized} + \text{unrealized} - \text{commissions}$). Untracked.
-3. `src/qrsip/simulation/risk.py` (202 LOC): Implemented pre-trade limit checks and peak-to-trough drawdown circuit breaker. Untracked.
-4. `src/qrsip/simulation/engine.py`: **MISSING**. The event loop orchestrating `MarketDataset` $\to$ `PointInTimeView` $\to$ `SignalStrategy` $\to$ `RiskEngine` $\to$ `CostModel` $\to$ `Portfolio` into a `SimulationResult` has not yet been authored.
-5. `src/qrsip/simulation/__init__.py`: **DEFECTIVE**. Contains a broken import (`from qrsip.dirty_exec import DummyBacktestEngine`) and attempts to export missing symbols from `qrsip.simulation.engine`.
-6. `tests/unit/test_simulation.py`: **MISSING**. Unit and property tests for simulation layer are not yet written.
+### L4 Simulation Layer (`src/qrsip/simulation/`)
+1. `src/qrsip/simulation/execution.py` (214 LOC): Implemented orders, next-bar open fills (ADR-0005), and explicit cost model (commissions + embedded slippage).
+2. `src/qrsip/simulation/portfolio.py` (239 LOC): Implemented cash-first double-entry accounting enforcing the verified equity invariant ($\text{equity} = \text{cash} + \text{realized} + \text{unrealized} - \text{commissions}$).
+3. `src/qrsip/simulation/risk.py` (197 LOC): Implemented pre-trade limit checks and peak-to-trough drawdown circuit breaker.
+4. `src/qrsip/simulation/engine.py` (484 LOC): Implemented deterministic `run_simulation` event loop connecting `MarketDataset`, strategies, risk, execution, and portfolio state.
+5. `src/qrsip/simulation/__init__.py` (60 LOC): Implemented clean package exports.
+6. `tests/unit/test_simulation.py` (735 LOC): 35 unit tests covering execution timing, costs, accounting, risk, short selling, multi-instrument behavior, point-in-time causality, and determinism.
 
-### L5 Validation Layer (`src/qrsip/validation/` — untracked in working directory)
-1. `src/qrsip/validation/stats.py` (149 LOC): Statistical significance math implemented (t-stat, normal approximation p-value, skewness, excess kurtosis, expected max normal, Deflated Sharpe Ratio). Untracked.
-2. `src/qrsip/validation/__init__.py` (30 LOC): Exports statistical functions. Clean import. Untracked.
-3. Known type defect: line 79 of `stats.py` returns `Any` from `m3 / (m2**1.5)` in strict mypy.
-4. `tests/unit/test_validation.py`: **MISSING**. Validation tests not yet written.
-5. Bias checks and walk-forward robustness engine: **MISSING**.
+### L5 Validation Layer (`src/qrsip/validation/`)
+1. `src/qrsip/validation/stats.py` (148 LOC): Statistical significance math implemented (t-stat, normal approximation p-value, skewness, excess kurtosis, expected max normal, Deflated Sharpe Ratio).
+2. `src/qrsip/validation/__init__.py` (30 LOC): Exports statistical functions. Clean import.
+3. `mypy src` passes after the explicit `float(...)` conversion in `sample_skewness`.
+4. Dedicated validation tests, bias checks, and walk-forward robustness engine remain outstanding.
 
 ### L6 Intelligence & L7 Presentation
 1. Research report generation engine: **MISSING** (entities defined in `domain/results.py`, but generator logic is unwritten).
@@ -118,15 +114,15 @@
 ## 4. Acceptance Criteria & Quality Gates Still Outstanding
 
 Per spec §50, the platform is considered **working** only when all of the following hold:
-- [x] Source code exists and architecture is implemented (L0–L3 complete, L4–L5 in progress)
+- [x] Source code exists and architecture is implemented (L0–L4 complete; L5 in progress)
 - [x] Storage contracts work (`StoragePort` + `FileStorage` verified with SHA-256 canonical JSON)
 - [x] P01 data contract works (enforced via `P01DataContract` and `PointInTimeView`)
-- [ ] Strategy execution works (L4 event loop `engine.py` pending)
-- [ ] Portfolio accounting is verified by unit/property tests (code written, tests pending)
-- [ ] Risk engine is verified by unit/property tests (code written, tests pending)
-- [x] Metrics are tested (272 unit tests passing, covering quant metrics, features, signals)
+- [x] Strategy execution works (deterministic L4 event loop with next-bar fills)
+- [x] Portfolio accounting is verified by unit tests
+- [x] Risk engine is verified by unit tests
+- [x] Metrics are tested (307 unit tests passing across completed layers)
 - [ ] Bias checks work (lookahead / multiple testing checks pending)
-- [ ] Adversarial tests work (`tests/adversarial/` empty)
+- [ ] Adversarial tests work (`tests/adversarial/` contains only its skeleton specification)
 - [ ] Reproduction works (automated reproduction verification command pending)
 - [x] CI is configured (`.github/workflows/ci.yml`, `security.yml` exist)
 - [x] Documentation matches reality (updated via this synchronization)
@@ -160,9 +156,7 @@ Per the P02 architecture specification and ADRs:
 
 ## 7. Immediate Next Engineering Steps
 
-1. **Fix Simulation Init**: Remove `from qrsip.dirty_exec import DummyBacktestEngine` from `src/qrsip/simulation/__init__.py`.
-2. **Implement Simulation Engine**: Author `src/qrsip/simulation/engine.py` with `run_simulation()`, connecting dataset, strategy, risk engine, execution, and portfolio into an event loop.
-3. **Write Simulation Unit Tests**: Create `tests/unit/test_simulation.py` covering order fill timing, cost deduction, cash exhaustion, and risk rejections.
-4. **Fix Validation Typing**: Fix `stats.py:79` to return `float(...)` to satisfy strict mypy.
-5. **Write Validation Tests**: Create `tests/unit/test_validation.py` asserting numerical bounds and deflated Sharpe ratio calculations.
-6. **Implement Research CLI & Reports**: Add experiment execution and Markdown report generation to `src/qrsip/cli.py`.
+1. **Write Validation Tests**: Create `tests/unit/test_validation.py` asserting numerical bounds and deflated Sharpe ratio calculations.
+2. **Implement Validation Runner**: Add bias verification (look-ahead and survivorship tests) and parameter sensitivity analysis.
+3. **Implement Research CLI & Reports**: Add experiment execution and Markdown report generation to `src/qrsip/cli.py`.
+4. **Add Higher-Order Tests**: Populate `tests/property/` and `tests/adversarial/` with invariant and failure-mode coverage.

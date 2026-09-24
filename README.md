@@ -124,11 +124,11 @@ Simulation accounting is cash-first and double-entry ([`portfolio.py`](file:///h
 
 ## 9. Current Testing Evidence
 
-The platform currently includes **272 passing automated unit tests**:
+The platform currently includes **307 passing automated unit tests**:
 
 ```bash
 $ pytest
-============================= 272 passed in 1.54s ==============================
+============================= 307 passed in 0.98s =============================
 ```
 
 * **Coverage Across Completed Layers**:
@@ -140,9 +140,10 @@ $ pytest
   * `test_errors.py` (16 tests): Error inheritance, structured context verification, and fail-closed behaviors.
   * `test_logging.py` (11 tests): JSON structured logging and timed events.
   * `test_quant.py` (64 tests): Causal moving averages, signal generators, and financial metrics (Sharpe, Sortino, Drawdown, etc.).
+  * `test_simulation.py` (35 tests): Execution timing, transaction costs, portfolio accounting, risk controls, short selling, multi-instrument behavior, point-in-time causality, and determinism.
 * **Static Analysis**:
   * `ruff check src tests`: Clean (0 errors).
-  * `mypy src`: Strict type-checking passing on all committed source files.
+  * `mypy src`: Strict type-checking passing on all 30 source files.
   * `bandit -r src -c pyproject.toml -ll`: Passing with zero medium/high security issues.
 
 ---
@@ -150,14 +151,11 @@ $ pytest
 ## 10. Current Implementation Status & Known Limitations
 
 ### Current Status
-* **Phases 0–3 (Foundation, Domain, Data, Quant)**: Fully completed, strictly typed, and thoroughly covered by automated unit tests.
-* **Phase 4 (Simulation)**: Core execution, portfolio accounting, and risk checks are written in working directory; the central event loop (`engine.py`) and simulation test suite are in progress.
-* **Phase 5 (Validation)**: Statistical significance functions are written; validation runner and bias checks are in progress.
+* **Phases 0–4 (Foundation, Domain, Data, Quant, Simulation)**: Fully completed, strictly typed, and covered by automated unit tests.
+* **Phase 5 (Validation)**: Statistical significance functions are implemented; dedicated validation tests, bias checks, and robustness analysis are still in progress.
 
 ### Known Limitations & Defects
-* **WIP Untracked Files**: `src/qrsip/simulation/` and `src/qrsip/validation/` are currently untracked in git.
-* **Defective Import in Simulation**: `src/qrsip/simulation/__init__.py` contains a broken reference to `qrsip.dirty_exec` and attempts to import an uncreated `engine.py`.
-* **Missing Event Loop**: The unified `run_simulation()` function connecting data feeds to orders and portfolios is not yet implemented.
+* **Validation Scope Remaining**: Dedicated `tests/unit/test_validation.py`, bias verification, and robustness analysis are not yet implemented.
 * **PostgreSQL Deferred**: Durable entity persistence currently uses `FileStorage` with SHA-256 canonical JSON. Relational database storage is deferred (ADR-0002).
 * **Higher-Order Tests Pending**: `tests/adversarial/`, `tests/property/`, `tests/integration/`, and `tests/acceptance/` currently contain only architectural README specifications.
 
@@ -166,12 +164,11 @@ $ pytest
 ## 11. Remaining Engineering Work
 
 To achieve full architecture baseline completion:
-1. **Simulation Event Loop**: Author `src/qrsip/simulation/engine.py` (`run_simulation`) and resolve import dependencies.
-2. **Simulation Unit Tests**: Author `tests/unit/test_simulation.py` covering fill timing, cash accounting, and risk breach handling.
-3. **Validation Runner**: Implement bias verification (look-ahead and survivorship tests) and parameter sensitivity analysis.
-4. **Research Report Generator**: Implement Markdown and JSON report rendering from experiment outcomes.
-5. **Research CLI Commands**: Wire experiment execution (`qrsip experiment run`) into `src/qrsip/cli.py`.
-6. **Property & Adversarial Test Suites**: Author tests in `tests/property/` and `tests/adversarial/`.
+1. **Validation Tests**: Author `tests/unit/test_validation.py` covering numerical bounds and deflated Sharpe calculations.
+2. **Validation Runner**: Implement bias verification (look-ahead and survivorship tests) and parameter sensitivity analysis.
+3. **Research Report Generator**: Implement Markdown and JSON report rendering from experiment outcomes.
+4. **Research CLI Commands**: Wire experiment execution (`qrsip experiment run`) into `src/qrsip/cli.py`.
+5. **Property & Adversarial Test Suites**: Author tests in `tests/property/` and `tests/adversarial/`.
 
 ---
 
