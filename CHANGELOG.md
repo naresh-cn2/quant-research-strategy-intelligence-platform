@@ -30,7 +30,7 @@ All notable changes to QRSIP are recorded here. The project follows [Keep a Chan
 ### External acceptance status
 
 - Clean-container acceptance: blocked because no supported container runtime is available in the current environment.
-- Current-tree GitHub Actions CI and Security execution: blocked because no authenticated workflow trigger is available; prior public runs apply to an older commit.
+- Current-tree GitHub Actions CI and Security: passed for commit `8251ebc` (runs `36135187982` and `36135187979`).
 - Canonical production P01 reference: unresolved because the repository contains the contract and adapter but no authoritative production artifact, manifest, or canonical checksum.
 
 ### Known limitations

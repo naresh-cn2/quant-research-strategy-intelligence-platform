@@ -162,7 +162,7 @@ Test tiers currently contain 338 unit tests, 3 contract tests, 2 property tests,
 
 * **Static analysis:** `ruff check src tests`, `ruff format --check src tests`, and `mypy src` pass.
 * **Security:** `bandit -r src -c pyproject.toml -ll` reports no medium/high issues.
-* **CI:** Workflow files are present. The latest public CI run on `27a9596` concluded with a failure at the integration-test step; the latest public Security run concluded with a failure at dependency audit. Current repairs are local and uncommitted, so a new external run is not yet available.
+* **CI:** The current pushed commit passed GitHub Actions CI and Security. The local documentation update does not alter implementation or test behavior.
 
 ---
 
@@ -171,11 +171,11 @@ Test tiers currently contain 338 unit tests, 3 contract tests, 2 property tests,
 ### Current Status
 * **Phases 0–7 (L0 Infrastructure through L7 Presentation):** Implemented and locally tested.
 * **Research workflow:** YAML experiment execution, canonical run artifacts, deterministic reruns, Markdown/JSON reports, and human promotion decisions are implemented.
-* **Verification:** 352 tests pass locally; clean-container acceptance and external CI execution remain outstanding.
+* **Verification:** 352 tests pass locally; external CI and Security passed for commit `8251ebc`; clean-container acceptance remains outstanding.
 
 ### Known Limitations & Defects
 * **Fresh-environment acceptance:** The repository acceptance test is executable, but a clean-container run has not been performed in this environment.
-* **CI execution:** The latest public CI/Security runs were observed and failed on the previous remote baseline; the repaired tree has not yet been executed externally.
+* **CI execution:** GitHub Actions CI and Security passed for the pushed commit `8251ebc`; clean-container acceptance remains outstanding.
 * **Synthetic fixture default:** The local CLI workflow uses explicitly labeled deterministic fixtures; real P01 production data is an external dependency and is not represented by these fixtures.
 * **PostgreSQL, FastAPI, AI copilot, Rust performance layer, dashboard, and live execution:** Deferred or explicitly excluded by the existing architecture and ADRs.
 
@@ -185,7 +185,7 @@ Test tiers currently contain 338 unit tests, 3 contract tests, 2 property tests,
 
 The current in-scope implementation is locally verified. Final release evidence still requires:
 1. A successful clean-container run of the repository acceptance workflow.
-2. Successful current-tree GitHub Actions CI and Security runs.
+2. A successful clean-container run of the repository acceptance workflow.
 3. Verification of an authoritative external P01 production reference if that artifact and its canonical identity are supplied; the repository does not currently define one.
 
 The deferred systems listed above are not implementation defects for P02.

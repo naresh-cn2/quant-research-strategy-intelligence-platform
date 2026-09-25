@@ -8,11 +8,11 @@
 # P02 — Quantitative Research & Strategy Intelligence Platform
 # ============================================================
 
-**Status:** BLOCKED — local implementation and verification pass; external acceptance gates remain incomplete (container runtime, external CI rerun, and production P01 reference)
+**Status:** BLOCKED — local implementation and verification pass; external acceptance gates remain incomplete (container runtime and production P01 reference)
 
 **Current Phase:** Final acceptance verification
 
-**Last Verified Baseline Commit:** `27a9596` (latest public remote commit; current acceptance repairs are uncommitted)
+**Last Verified Baseline Commit:** `8251ebc` (pushed to `origin/main`; CI and Security passed)
 
 **Last Verification Timestamp:** 2026-09-25
 
@@ -122,8 +122,8 @@ According to the repository acceptance checklist, the platform is considered **w
 - [x] Adversarial, property, contract, integration, acceptance, and regression tests are executable
 - [x] Reproduction is verified by canonical digest comparison
 - [x] Local verification harness passes (`scripts/validation/run_checks.sh`)
+- [x] CI and Security workflows passed on commit `8251ebc` (runs `36135187982` and `36135187979`)
 - [ ] Fresh-environment acceptance test passes in a clean container (blocked: Docker/Podman/nerdctl unavailable)
-- [ ] CI workflows have passed on the current repaired tree (blocked: latest public CI/Security runs failed on `27a9596`; no authenticated run trigger available)
 - [ ] External checksum-bound P01 production reference is verified (blocked: no production dataset source/checksum/artifact is documented or available)
 
 ---
@@ -156,5 +156,4 @@ Per the P02 architecture specification and ADRs:
 
 The current in-scope implementation is locally verified. Final acceptance is blocked only by external evidence gates:
 1. Run the acceptance workflow in a clean, reproducible container.
-2. Push or otherwise trigger the repaired workflows and record successful GitHub Actions results.
-3. Supply an authoritative external P01 production artifact and manifest, if that artifact is required by a future acceptance decision, and verify its checksum/schema.
+2. Supply an authoritative external P01 production artifact and manifest, if that artifact is required by a future acceptance decision, and verify its checksum/schema.
