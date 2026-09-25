@@ -12,7 +12,7 @@
 
 **Current Phase:** Final acceptance verification
 
-**Last Verified Baseline Commit:** `8251ebc` (pushed to `origin/main`; CI and Security passed)
+**Last Verified Baseline Commit:** `8fc4590` (pushed to `origin/main`; CI run `36135583631` and Security run `36135583745` passed)
 
 **Last Verification Timestamp:** 2026-09-25
 
@@ -122,7 +122,7 @@ According to the repository acceptance checklist, the platform is considered **w
 - [x] Adversarial, property, contract, integration, acceptance, and regression tests are executable
 - [x] Reproduction is verified by canonical digest comparison
 - [x] Local verification harness passes (`scripts/validation/run_checks.sh`)
-- [x] CI and Security workflows passed on commit `8251ebc` (runs `36135187982` and `36135187979`)
+- [x] CI and Security workflows passed on verified baseline `8fc4590` (runs `36135583631` and `36135583745`)
 - [ ] Fresh-environment acceptance test passes in a clean container (blocked: Docker/Podman/nerdctl unavailable)
 - [ ] External checksum-bound P01 production reference is verified (blocked: no production dataset source/checksum/artifact is documented or available)
 
