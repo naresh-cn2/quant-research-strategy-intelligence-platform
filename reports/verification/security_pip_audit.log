@@ -1,0 +1,11 @@
+Found 4 known vulnerabilities in 2 packages
+Name    Version ID              Fix Versions
+------- ------- --------------- ------------
+pyarrow 21.0.0  PYSEC-2026-113  23.0.1
+pyarrow 21.0.0  PYSEC-2026-113  23.0.1
+pytest  8.4.2   PYSEC-2026-1845 9.0.3
+pytest  8.4.2   PYSEC-2026-1845 9.0.3
+
+Name  Skip Reason
+----- --------------------------------------------------------------------
+qrsip Dependency not found on PyPI and could not be audited: qrsip (0.1.0)

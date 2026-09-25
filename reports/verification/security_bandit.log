@@ -1,0 +1,81 @@
+Run started:2026-09-25 07:36:34.023379+00:00
+
+Test results:
+>> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+   Severity: Low   Confidence: High
+   CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b101_assert_used.html
+   Location: src/qrsip/config.py:204:8
+203	        sanitized: dict[str, Any] = sanitize_for_storage(mapping)
+204	        assert isinstance(sanitized, dict)
+205	        return sanitized
+
+--------------------------------------------------
+>> Issue: [B404:blacklist] Consider possible security implications associated with the subprocess module.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b404-import-subprocess
+   Location: src/qrsip/doctor.py:19:0
+18	
+19	import subprocess
+20	import sys
+
+--------------------------------------------------
+>> Issue: [B607:start_process_with_partial_path] Starting a process with a partial executable path
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b607_start_process_with_partial_path.html
+   Location: src/qrsip/doctor.py:176:12
+175	        try:
+176	            subprocess.run(
+177	                ["git", "version"],
+178	                stdout=subprocess.DEVNULL,
+179	                stderr=subprocess.DEVNULL,
+180	                timeout=5,
+181	            )
+182	            check.status = "pass"
+
+--------------------------------------------------
+>> Issue: [B603:subprocess_without_shell_equals_true] subprocess call - check for execution of untrusted input.
+   Severity: Low   Confidence: High
+   CWE: CWE-78 (https://cwe.mitre.org/data/definitions/78.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b603_subprocess_without_shell_equals_true.html
+   Location: src/qrsip/doctor.py:176:12
+175	        try:
+176	            subprocess.run(
+177	                ["git", "version"],
+178	                stdout=subprocess.DEVNULL,
+179	                stderr=subprocess.DEVNULL,
+180	                timeout=5,
+181	            )
+182	            check.status = "pass"
+
+--------------------------------------------------
+>> Issue: [B105:hardcoded_password_string] Possible hardcoded password: 'PASS'
+   Severity: Low   Confidence: Medium
+   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
+   More Info: https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html
+   Location: src/qrsip/validation/bias.py:25:11
+24	class ValidationStatus(StrEnum):
+25	    PASS = "PASS"
+26	    FAIL = "FAIL"
+
+--------------------------------------------------
+
+Code scanned:
+	Total lines of code: 5165
+	Total lines skipped (#nosec): 0
+	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
+
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 5
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 1
+		High: 4
+Files skipped (0):

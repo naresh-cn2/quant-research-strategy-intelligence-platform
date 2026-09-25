@@ -57,16 +57,19 @@
 #   LEVEL 4 — Adversarially validated
 #   LEVEL 5 — Portfolio-grade
 #
-# Current implementation status (as of 2026-09-23):
+# Current implementation status (as of 2026-09-25):
 #
 #   - L0 Infrastructure: COMPLETE & TESTED (StoragePort + FileStorage; PostgreSQL deferred per ADR-0002)
 #   - L1 Domain: COMPLETE & TESTED (Research entities, 12-state lifecycle, research registry)
-#   - L2 Data: COMPLETE & TESTED (P01DataContract, PointInTimeView, bar validators, fixtures)
+#   - L2 Data: COMPLETE & TESTED (P01DataContract, PointInTimeView, bar validators, fixtures, Parquet adapter)
 #   - L3 Quant: COMPLETE & TESTED (Causal features, signals, metrics)
-#   - L4 Simulation: IN PROGRESS (Execution, portfolio, risk written; event-loop engine pending)
-#   - L5 Validation: IN PROGRESS (Significance math written; bias/robustness checks pending)
-#   - L6 Intelligence: PARTIAL (Entities defined; report generator pending)
-#   - L7 Presentation: PARTIAL (CLI skeleton implemented; experiment subcommands pending)
+#   - L4 Simulation: COMPLETE & TESTED (Execution, portfolio, risk, deterministic event loop)
+#   - L5 Validation: COMPLETE & TESTED (significance, bias, multiple testing, robustness)
+#   - L6 Intelligence: COMPLETE & TESTED (lineage artifacts, reports, reproduction)
+#   - L7 Presentation: COMPLETE & TESTED (research CLI and human promotion gate)
+#
+# Repository-local acceptance and quality gates pass. Clean-container acceptance
+# and external CI execution remain pending.
 #
 # Detailed operational matrix and verification evidence are tracked in
 # PROJECT_STATUS.md.

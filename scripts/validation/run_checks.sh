@@ -65,7 +65,7 @@ run_check acceptance "$PY" -m pytest tests/acceptance -q
 
 if [[ "$FAST" -eq 0 ]]; then
   if "$PY" -c "import bandit" >/dev/null 2>&1; then
-    run_check security_bandit "$PY" -m bandit -q -r src
+    run_check security_bandit "$PY" -m bandit -q -r src -c pyproject.toml -ll
   else
     echo "SKIP  security_bandit (bandit not installed)"
   fi

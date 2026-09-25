@@ -38,6 +38,8 @@ __all__ = [
 
 def normal_cdf(x: float) -> float:
     """Standard normal CDF via ``math.erf`` (exact to double precision)."""
+    if not math.isfinite(x):
+        raise MetricError("normal CDF argument must be finite", value=x)
     return 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
 
 

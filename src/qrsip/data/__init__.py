@@ -1,7 +1,8 @@
 """QRSIP data layer (L2 Data).
 
-Provides the P01 contract, deterministic fixtures, dataset validation, and
-point-in-time access. This layer owns *how* market data reaches the platform and
+Provides the P01 contract, deterministic fixtures, checksum-bound Parquet
+access, dataset validation, and point-in-time access. This layer owns *how*
+market data reaches the platform and
 enforces the rule that no strategy may observe the future (spec §17).
 
 Modules:
@@ -9,6 +10,7 @@ Modules:
 - :mod:`qrsip.data.fixtures`   — deterministic, clearly-labelled fixtures
 - :mod:`qrsip.data.dataset`    — market dataset + point-in-time view
 - :mod:`qrsip.data.validation` — schema and quality validation
+- :mod:`qrsip.data.parquet`   — checksum-bound Parquet P01 adapter
 """
 
 from __future__ import annotations
@@ -28,6 +30,7 @@ from qrsip.data.dataset import (
     PointInTimeView,
 )
 from qrsip.data.fixtures import FixtureP01Provider, build_fixture_bars
+from qrsip.data.parquet import ParquetP01Adapter, load_parquet_dataset, manifest_bytes
 from qrsip.data.validation import (
     DataIssue,
     DataValidationReport,
@@ -48,10 +51,13 @@ __all__ = [
     "MarketDataset",
     "MarketSnapshot",
     "P01DataContract",
+    "ParquetP01Adapter",
     "PointInTimeView",
     "SchemaError",
     "Severity",
     "build_fixture_bars",
+    "load_parquet_dataset",
+    "manifest_bytes",
     "parse_bars",
     "validate_bars",
 ]

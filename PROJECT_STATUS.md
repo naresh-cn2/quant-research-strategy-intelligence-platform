@@ -8,13 +8,13 @@
 # P02 — Quantitative Research & Strategy Intelligence Platform
 # ============================================================
 
-**Status:** IN PROGRESS — NOT COMPLETE (Phases 0–4 Complete & Tested; Phase 5 WIP)
+**Status:** IN PROGRESS — NOT COMPLETE (L0–L7 implemented and locally verified; clean-environment acceptance and CI execution pending)
 
-**Current Phase:** Phase 5 (Validation) — In Progress
+**Current Phase:** Final acceptance verification
 
 **Last Verified Baseline Commit:** `e4f45e6` ("docs: synchronize P02 architecture and project status")
 
-**Last Verification Timestamp:** 2026-09-24
+**Last Verification Timestamp:** 2026-09-25
 
 ---
 
@@ -37,7 +37,7 @@
 | | Bar Validation (`validation.py`) | **Implemented** | **Tested** (part of data) | Fail-closed OHLC, ordering, duplicate, and non-negative validators |
 | | Point-in-Time Access (`dataset.py`) | **Implemented** | **Tested** (part of data) | `MarketDataset` + `PointInTimeView`; raises `LookAheadError` on future access |
 | | Deterministic Fixtures (`fixtures.py`)| **Implemented** | **Tested** (part of data) | `FixtureP01Provider` generating reproducible multi-instrument bar sets |
-| | Parquet/Arrow Dataset Loader | **Partial** | N/A | In-memory bar fixtures complete; disk-based Parquet reader pending |
+| | | Parquet/Arrow Dataset Loader (`parquet.py`) | **Implemented** | **Tested** | Checksum-bound Parquet P01 adapter; schema, row-count, instrument, coverage, and bar-quality checks |
 | **L3 Quant** | Causal Features (`features.py`) | **Implemented** | **Tested** (part of quant) | SMA, EMA, simple/log returns, rolling volatility, momentum; warm-up is `None` |
 | | Strategy Signals (`signals.py`) | **Implemented** | **Tested** (part of quant) | `SignalStrategy` protocol, `MovingAverageCrossStrategy`, `ConstantStrategy` |
 | | Financial Metrics (`metrics.py`) | **Implemented** | **Tested** (part of quant) | Sharpe, Sortino, Calmar, Max Drawdown, Win Rate, Profit Factor, `PerformanceMetrics` |
@@ -46,14 +46,14 @@
 | | Risk Engine (`risk.py`) | **Implemented** | **Tested** (simulation suite) | Pre-trade order limits (notional, position, gross exposure), drawdown circuit breaker |
 | | Event-Loop Engine (`engine.py`) | **Implemented** | **Tested** (simulation suite) | `run_simulation` deterministic loop connecting dataset, signals, risk, execution, portfolio |
 | | Module Entrypoint (`__init__.py`) | **Implemented** | **Import smoke-tested** | Clean package exports for the simulation layer |
-| **L5 Validation** | Validation Math (`stats.py`) | **Implemented** | **Dedicated tests pending** | t-statistic, normal approximation p-value, skewness, kurtosis, Deflated Sharpe Ratio |
-| | Validation Runner & Bias Checks | **Missing** | **Missing** | Look-ahead bias verification, multiple-testing correction, survivorship check |
-| | Robustness Suite | **Missing** | **Missing** | Parameter sensitivity grid, walk-forward analysis, perturbation testing |
-| **L6 Intelligence** | Research Report Generator | **Partial** | **Missing** | Domain entities defined in `results.py`; Markdown/JSON report synthesis engine missing |
-| | Experiment Comparison / Diffing | **Missing** | **Missing** | Lineage and comparison engine across runs not yet implemented |
+| | **L5 Validation** | Validation Math (`stats.py`) | **Implemented** | **Dedicated tests** | t-statistic, normal approximation p-value, skewness, kurtosis, Deflated Sharpe Ratio |
+| | Validation Runner & Bias Checks | **Implemented** | **Tested** | Look-ahead bias verification, multiple-testing correction, survivorship evidence |
+| | Robustness Suite | **Implemented** | **Tested** | Parameter sensitivity and walk-forward validation evidence |
+| **L6 Intelligence** | Research Report Generator | **Implemented** | **Tested** | Deterministic Markdown/JSON reports with lineage, metrics, validation, assumptions, and limitations |
+| | Experiment Artifact & Reproduction | **Implemented** | **Tested** | Canonical JSON run artifact, lineage records, deterministic digest, and fail-closed rerun |
 | | AI Copilot / Assistant | **Deferred** | N/A | Deferred per architecture spec until deterministic foundations are complete |
-| **L7 Presentation** | CLI Skeleton (`cli.py`) | **Implemented** | **Tested** (10 tests) | `qrsip init`, `qrsip doctor`, `qrsip status` |
-| | Research CLI Commands | **Missing** | **Missing** | `qrsip experiment run`, `qrsip experiment rerun`, `qrsip report show`, `qrsip promote` |
+| **L7 Presentation** | CLI Skeleton (`cli.py`) | **Implemented** | **Tested** | `qrsip init`, `qrsip doctor`, `qrsip status` |
+| | Research CLI Commands | **Implemented** | **Tested** | `qrsip experiment run`, `qrsip experiment rerun`, `qrsip report show`, `qrsip promote` |
 | | FastAPI REST API | **Deferred** | N/A | Deferred per ADR-0003 until an external HTTP consumer requires it |
 | | Dashboard UI | **Excluded** | N/A | Explicitly out of scope for P02 (spec §4.1, §47) |
 
@@ -61,31 +61,23 @@
 
 ## 2. Test Suite & Verification Status
 
-* **Total Automated Tests Passing:** **307** (in 0.98s via Python 3.12 / pytest 8.4.2)
-* **Unit Test Breakdown by Suite:**
-  * `tests/unit/test_cli.py`: 10 passed
-  * `tests/unit/test_config.py`: 31 passed
-  * `tests/unit/test_data.py`: 67 passed
-  * `tests/unit/test_doctor.py`: 14 passed
-  * `tests/unit/test_domain.py`: 59 passed
-  * `tests/unit/test_errors.py`: 16 passed
-  * `tests/unit/test_logging.py`: 11 passed
-  * `tests/unit/test_quant.py`: 64 passed
-  * `tests/unit/test_simulation.py`: 35 passed
-* **Higher-Order Test Suites (Status: SKELETON ONLY — 0 tests written yet):**
-  * `tests/contract/`: SKELETON (only `README.md`)
-  * `tests/property/`: SKELETON (only `README.md`)
-  * `tests/adversarial/`: SKELETON (only `README.md`)
-  * `tests/integration/`: SKELETON (only `README.md`)
-  * `tests/acceptance/`: SKELETON (only `README.md`)
-  * `tests/regression/`: SKELETON (only `README.md`)
+* **Total Automated Tests Passing:** **352** (repository environment, Python 3.12 / pytest 8.4.2)
+* **Test Tier Breakdown:**
+  * `tests/unit/`: 338 passed
+  * `tests/contract/`: 3 passed
+  * `tests/property/`: 2 passed
+  * `tests/adversarial/`: 4 passed
+  * `tests/integration/`: 2 passed
+  * `tests/acceptance/`: 1 passed
+  * `tests/regression/`: 2 passed
 * **Linter & Formatter Status:**
-  * `ruff format --check src tests`: Clean (48 files).
+  * `ruff format --check src tests`: Clean (63 files).
   * `ruff check src tests`: Clean (0 errors).
 * **Type Checking Status:**
-  * `mypy src`: Passing on all 30 source files.
+  * `mypy src`: Passing on all 36 source files.
 * **Security Audit Status:**
-  * `bandit -r src -c pyproject.toml -ll`: Passing (0 medium/high issues across 3,879 LOC).
+  * `bandit -r src -c pyproject.toml -ll`: Passing (0 medium/high issues).
+* **CI Status:** Workflow files are present; GitHub Actions execution has not been performed in this environment.
 
 ---
 
@@ -100,33 +92,37 @@
 6. `tests/unit/test_simulation.py` (735 LOC): 35 unit tests covering execution timing, costs, accounting, risk, short selling, multi-instrument behavior, point-in-time causality, and determinism.
 
 ### L5 Validation Layer (`src/qrsip/validation/`)
-1. `src/qrsip/validation/stats.py` (148 LOC): Statistical significance math implemented (t-stat, normal approximation p-value, skewness, excess kurtosis, expected max normal, Deflated Sharpe Ratio).
-2. `src/qrsip/validation/__init__.py` (30 LOC): Exports statistical functions. Clean import.
-3. `mypy src` passes after the explicit `float(...)` conversion in `sample_skewness`.
-4. Dedicated validation tests, bias checks, and walk-forward robustness engine remain outstanding.
+1. `stats.py`: Significance math, p-values, skewness, kurtosis, expected maximum normal, and Deflated Sharpe Ratio.
+2. `bias.py`: Look-ahead and survivorship evidence models and checks.
+3. `multiple_testing.py`: Deterministic Holm correction.
+4. `robustness.py`: Parameter sensitivity and walk-forward evidence.
+5. `runner.py`: Fail-closed validation orchestration and immutable summaries.
+6. `tests/unit/test_validation.py`: Boundary, invalid-input, numerical, deterministic, and failure-mode coverage.
 
 ### L6 Intelligence & L7 Presentation
-1. Research report generation engine: **MISSING** (entities defined in `domain/results.py`, but generator logic is unwritten).
-2. Experiment run CLI subcommands (`qrsip experiment run`, `qrsip experiment rerun`): **MISSING**.
+1. `intelligence.py`: Resolved settings, P01/fixture and Parquet loading, deterministic simulation, metrics, validation, lineage joins, canonical artifacts, reports, and rerun verification.
+2. `cli.py`: `experiment run`, `experiment rerun`, `report show`, and human-controlled `promote` workflows.
+3. `tests/contract/`, `tests/integration/`, `tests/property/`, `tests/adversarial/`, `tests/acceptance/`, and `tests/regression/`: Executable contract and higher-order verification.
 
 ---
 
 ## 4. Acceptance Criteria & Quality Gates Still Outstanding
 
 Per spec §50, the platform is considered **working** only when all of the following hold:
-- [x] Source code exists and architecture is implemented (L0–L4 complete; L5 in progress)
+- [x] Source code exists and architecture is implemented (L0–L7)
 - [x] Storage contracts work (`StoragePort` + `FileStorage` verified with SHA-256 canonical JSON)
-- [x] P01 data contract works (enforced via `P01DataContract` and `PointInTimeView`)
+- [x] P01 data contract works (enforced via `P01DataContract`, fixtures, and `PointInTimeView`)
 - [x] Strategy execution works (deterministic L4 event loop with next-bar fills)
 - [x] Portfolio accounting is verified by unit tests
 - [x] Risk engine is verified by unit tests
-- [x] Metrics are tested (307 unit tests passing across completed layers)
-- [ ] Bias checks work (lookahead / multiple testing checks pending)
-- [ ] Adversarial tests work (`tests/adversarial/` contains only its skeleton specification)
-- [ ] Reproduction works (automated reproduction verification command pending)
+- [x] Metrics and validation evidence are tested
+- [x] Bias checks, multiple-testing correction, sensitivity, and walk-forward evidence are tested
+- [x] Adversarial, property, contract, integration, acceptance, and regression tests are executable
+- [x] Reproduction is verified by canonical digest comparison
 - [x] CI is configured (`.github/workflows/ci.yml`, `security.yml` exist)
-- [x] Documentation matches reality (updated via this synchronization)
-- [ ] Fresh-environment acceptance test passes (end-to-end acceptance run in clean container pending)
+- [x] Documentation matches the locally verified implementation
+- [ ] Fresh-environment acceptance test passes in a clean container
+- [ ] CI workflows have been executed and recorded in an external CI system
 
 ---
 
@@ -154,9 +150,9 @@ Per the P02 architecture specification and ADRs:
 
 ---
 
-## 7. Immediate Next Engineering Steps
+## 7. Release Verification Work
 
-1. **Write Validation Tests**: Create `tests/unit/test_validation.py` asserting numerical bounds and deflated Sharpe ratio calculations.
-2. **Implement Validation Runner**: Add bias verification (look-ahead and survivorship tests) and parameter sensitivity analysis.
-3. **Implement Research CLI & Reports**: Add experiment execution and Markdown report generation to `src/qrsip/cli.py`.
-4. **Add Higher-Order Tests**: Populate `tests/property/` and `tests/adversarial/` with invariant and failure-mode coverage.
+The current in-scope implementation is locally verified. Remaining release verification is:
+1. Run the acceptance workflow in a clean, reproducible environment.
+2. Execute the configured CI workflows and record their result.
+3. Replace the synthetic fixture dataset with the external, checksum-bound P01 production reference when that artifact is available.

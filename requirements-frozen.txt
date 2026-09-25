@@ -28,18 +28,17 @@ pip_audit==2.10.1
 platformdirs==4.11.12
 pluggy==1.6.0
 py-serializable==2.1.0
-pyarrow==21.0.0
+pyarrow==23.0.1
 pydantic==2.13.5
 pydantic_core==2.46.5
 Pygments==2.21.0
 pyparsing==3.3.3
-pytest==8.4.2
+pytest==9.1.1
 pytest-cov==5.0.0
 python-dateutil==2.9.0.post0
 pytz==2026.3.post1
 PyYAML==6.0.3
-## !! Could not determine repository location
--e /home/mrcn2/quant-research-strategy-intelligence-platform
+-e git+https://github.com/naresh-cn2/quant-research-strategy-intelligence-platform.git@c4d4faac371ab06095a4cb9f20e11883c48b8ef5#egg=qrsip
 requests==2.34.2
 rich==15.0.0
 ruff==0.16.8

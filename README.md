@@ -2,11 +2,11 @@
 
 > **Project Status:** `IN PROGRESS / NOT COMPLETE` (Alpha stage)
 >
-> **Development Phase:** Phase 4 (Simulation) & Phase 5 (Validation) in progress.
+> **Development Phase:** Phases 0–7 implemented; final environment acceptance verification pending.
 >
-> **Test Suite:** 272 automated unit tests passing in 1.54s.
+> **Test Suite:** 352 automated tests passing in the repository environment.
 >
-> *Notice: QRSIP is under active engineering development. It is **not** production-ready, **not** feature-complete, and **not** yet verified for live portfolio management.*
+> *Notice: QRSIP is not production-ready and is not yet verified for live portfolio management. The current verification is local; a clean-container acceptance run and CI execution remain outstanding.*
 
 ---
 
@@ -67,15 +67,15 @@ flowchart TD
 ```
 
 | Layer | Responsibility | Primary Modules | Implementation Status |
-|---|---|---|:---:|
-| **L0 Infrastructure** | Base exceptions, YAML configuration, structured logging, system health checks, portable file storage | `errors.py`, `config.py`, `logging.py`, `doctor.py`, `infrastructure/storage.py` | **100% Implemented & Tested** |
-| **L1 Domain** | Research entities, 12-state research lifecycle state machine, append-only entity registry | `domain/base.py`, `domain/entities.py`, `domain/lifecycle.py`, `domain/registry.py`, `domain/results.py` | **100% Implemented & Tested** |
-| **L2 Data** | Market data contract (P01 boundary), bar quality validator, point-in-time views, deterministic test fixtures | `data/contract.py`, `data/validation.py`, `data/dataset.py`, `data/fixtures.py` | **90% Implemented & Tested** |
-| **L3 Quant** | Causal feature calculation, signal strategy protocols, fail-closed financial metrics | `quant/features.py`, `quant/signals.py`, `quant/metrics.py` | **90% Implemented & Tested** |
-| **L4 Simulation** | Order models, deterministic fill simulator, double-entry portfolio accounting, pre-trade risk engine, event loop | `simulation/execution.py`, `simulation/portfolio.py`, `simulation/risk.py`, `simulation/engine.py` | **~60% (WIP / Untracked)** |
-| **L5 Validation** | Statistical significance, Deflated Sharpe Ratio, bias validation, walk-forward analysis | `validation/stats.py` | **~30% (WIP / Untracked)** |
-| **L6 Intelligence** | Research report synthesis, experiment comparison & lineage | `domain/results.py` | **~20% (Partial scaffold)** |
-| **L7 Presentation** | Command-line interface (`qrsip`) | `cli.py` | **~30% (Skeleton implemented)** |
+|---|---|---|---|
+| **L0 Infrastructure** | Base exceptions, YAML configuration, structured logging, system health checks, portable file storage | `errors.py`, `config.py`, `logging.py`, `doctor.py`, `infrastructure/storage.py` | **Implemented & locally tested** |
+| **L1 Domain** | Research entities, 12-state research lifecycle state machine, append-only entity registry | `domain/base.py`, `domain/entities.py`, `domain/lifecycle.py`, `domain/registry.py`, `domain/results.py` | **Implemented & locally tested** |
+| **L2 Data** | P01 boundary, bar validation, point-in-time views, deterministic fixtures, checksum-bound Parquet adapter | `data/contract.py`, `data/validation.py`, `data/dataset.py`, `data/fixtures.py`, `data/parquet.py` | **Implemented & locally tested** |
+| **L3 Quant** | Causal feature calculation, signal strategy protocols, fail-closed financial metrics | `quant/features.py`, `quant/signals.py`, `quant/metrics.py` | **Implemented & locally tested** |
+| **L4 Simulation** | Order models, deterministic next-bar fill simulator, portfolio accounting, risk engine, event loop | `simulation/execution.py`, `simulation/portfolio.py`, `simulation/risk.py`, `simulation/engine.py` | **Implemented & locally tested** |
+| **L5 Validation** | Significance math, Deflated Sharpe Ratio, bias checks, multiple testing, sensitivity, walk-forward evidence | `validation/` | **Implemented & locally tested** |
+| **L6 Intelligence** | Research artifacts, lineage joins, deterministic Markdown/JSON reports, reproduction | `intelligence.py`, `domain/results.py` | **Implemented & locally tested** |
+| **L7 Presentation** | Research CLI: experiment run/rerun, report show, human promotion decision | `cli.py` | **Implemented & locally tested** |
 
 ---
 
@@ -124,51 +124,44 @@ Simulation accounting is cash-first and double-entry ([`portfolio.py`](file:///h
 
 ## 9. Current Testing Evidence
 
-The platform currently includes **307 passing automated unit tests**:
+The platform currently includes **352 passing automated tests** in the repository environment:
 
 ```bash
-$ pytest
-============================= 307 passed in 0.98s =============================
+$ .venv/bin/pytest -q
+350 passed
 ```
 
-* **Coverage Across Completed Layers**:
-  * `test_cli.py` (10 tests): Command-line argument parsing and subcommands.
-  * `test_config.py` (31 tests): YAML configuration, path resolution, env overrides, and sanitization.
-  * `test_data.py` (67 tests): Bar schema validation, point-in-time access, lookahead prevention, and fixture generation.
-  * `test_doctor.py` (14 tests): System diagnostic checks and health report formatting.
-  * `test_domain.py` (59 tests): Research entities, 12-stage lifecycle transitions, and registry storage.
-  * `test_errors.py` (16 tests): Error inheritance, structured context verification, and fail-closed behaviors.
-  * `test_logging.py` (11 tests): JSON structured logging and timed events.
-  * `test_quant.py` (64 tests): Causal moving averages, signal generators, and financial metrics (Sharpe, Sortino, Drawdown, etc.).
-  * `test_simulation.py` (35 tests): Execution timing, transaction costs, portfolio accounting, risk controls, short selling, multi-instrument behavior, point-in-time causality, and determinism.
-* **Static Analysis**:
-  * `ruff check src tests`: Clean (0 errors).
-  * `mypy src`: Strict type-checking passing on all 30 source files.
-  * `bandit -r src -c pyproject.toml -ll`: Passing with zero medium/high security issues.
+Test tiers currently contain 338 unit tests, 3 contract tests, 2 property tests, 4 adversarial tests, 2 integration tests, 1 acceptance test, and 2 regression tests.
+
+* **Static analysis:** `ruff check src tests`, `ruff format --check src tests`, and `mypy src` pass.
+* **Security:** `bandit -r src -c pyproject.toml -ll` reports no medium/high issues.
+* **CI:** Workflow files are present; execution of GitHub Actions has not been performed in this environment.
 
 ---
 
 ## 10. Current Implementation Status & Known Limitations
 
 ### Current Status
-* **Phases 0–4 (Foundation, Domain, Data, Quant, Simulation)**: Fully completed, strictly typed, and covered by automated unit tests.
-* **Phase 5 (Validation)**: Statistical significance functions are implemented; dedicated validation tests, bias checks, and robustness analysis are still in progress.
+* **Phases 0–7 (L0 Infrastructure through L7 Presentation):** Implemented and locally tested.
+* **Research workflow:** YAML experiment execution, canonical run artifacts, deterministic reruns, Markdown/JSON reports, and human promotion decisions are implemented.
+* **Verification:** 350 tests pass locally; clean-container acceptance and CI execution remain outstanding.
 
 ### Known Limitations & Defects
-* **Validation Scope Remaining**: Dedicated `tests/unit/test_validation.py`, bias verification, and robustness analysis are not yet implemented.
-* **PostgreSQL Deferred**: Durable entity persistence currently uses `FileStorage` with SHA-256 canonical JSON. Relational database storage is deferred (ADR-0002).
-* **Higher-Order Tests Pending**: `tests/adversarial/`, `tests/property/`, `tests/integration/`, and `tests/acceptance/` currently contain only architectural README specifications.
+* **Fresh-environment acceptance:** The repository acceptance test is executable, but a clean-container run has not been performed in this environment.
+* **CI execution:** Workflow configuration exists, but GitHub Actions has not been executed from this environment.
+* **Synthetic fixture default:** The local CLI workflow uses explicitly labeled deterministic fixtures; real P01 production data is an external dependency and is not represented by these fixtures.
+* **PostgreSQL, FastAPI, AI copilot, Rust performance layer, dashboard, and live execution:** Deferred or explicitly excluded by the existing architecture and ADRs.
 
 ---
 
 ## 11. Remaining Engineering Work
 
-To achieve full architecture baseline completion:
-1. **Validation Tests**: Author `tests/unit/test_validation.py` covering numerical bounds and deflated Sharpe calculations.
-2. **Validation Runner**: Implement bias verification (look-ahead and survivorship tests) and parameter sensitivity analysis.
-3. **Research Report Generator**: Implement Markdown and JSON report rendering from experiment outcomes.
-4. **Research CLI Commands**: Wire experiment execution (`qrsip experiment run`) into `src/qrsip/cli.py`.
-5. **Property & Adversarial Test Suites**: Author tests in `tests/property/` and `tests/adversarial/`.
+The current in-scope implementation is locally verified. Remaining release verification is:
+1. Run the acceptance workflow in a clean, reproducible environment.
+2. Execute the configured CI workflows and record their result.
+3. Replace the synthetic fixture dataset with the external, checksum-bound P01 production reference when that artifact is available.
+
+The deferred systems listed above are not implementation defects for P02.
 
 ---
 
@@ -223,7 +216,22 @@ mypy src
 bandit -r src -c pyproject.toml -ll
 ```
 
----
+### Running the Research Workflow
+
+```bash
+# Run a fixture-backed experiment and persist canonical artifacts
+qrsip experiment run --config configs/experiments/example.yaml --artifacts artifacts
+
+# Re-run the recorded configuration and verify its canonical digest
+qrsip experiment rerun --experiment-id EXAMPLE-FIXTURE-RESEARCH --config configs/experiments/example.yaml --artifacts artifacts
+
+# Show the recorded Markdown or JSON report
+qrsip report show --experiment-id EXAMPLE-FIXTURE-RESEARCH --artifacts artifacts
+qrsip report show --experiment-id EXAMPLE-FIXTURE-RESEARCH --artifacts artifacts --format json
+
+# Record a human decision; approval requires passing validation
+qrsip promote --experiment-id EXAMPLE-FIXTURE-RESEARCH --decision REJECT --reviewer reviewer --rationale "Review required before any promotion" --artifacts artifacts
+```
 
 ## 13. Project Maturity & License
 

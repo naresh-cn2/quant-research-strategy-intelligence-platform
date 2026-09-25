@@ -1,0 +1,24 @@
+id: EXAMPLE-FIXTURE-RESEARCH
+question: Does a deterministic fixture workflow produce a reproducible research artifact?
+hypothesis: The recorded simulation and validation evidence can be reproduced from the recorded configuration.
+strategy:
+  kind: constant
+  signal: LONG
+data:
+  provider: fixture
+  dataset_id: EXAMPLE-FIXTURE
+  instruments: [FIXTURE-EQ]
+  periods: 32
+  seed: 42
+simulation:
+  initial_cash: 100000
+  order_quantity: 1
+  cost:
+    commission_bps: 5
+    slippage_bps: 2
+  risk:
+    max_drawdown: 0.25
+validation:
+  significance_level: 0.05
+  trials: 1
+  periods_per_year: 252

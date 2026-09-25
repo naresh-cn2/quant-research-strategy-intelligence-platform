@@ -1,0 +1,17 @@
+{
+  "checks": {
+    "format": "pass",
+    "lint": "pass",
+    "typecheck": "pass",
+    "unit": "pass",
+    "integration": "pass",
+    "contract": "pass",
+    "property": "pass",
+    "regression": "pass",
+    "adversarial": "pass",
+    "acceptance": "pass",
+    "security_bandit": "fail:1",
+    "security_pip_audit": "fail:1"
+  },
+  "overall": \"fail\"
+}
