@@ -25,13 +25,22 @@ if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
 
-def pytest_configure(config: pytest.Config) -> None:
-    """Register custom markers (mirrored from pyproject.toml)."""
-    config.addinivalue_line(
-        "markers", "adversarial: tests that deliberately attempt to break the system"
-    )
-    config.addinivalue_line("markers", "acceptance: end-to-end acceptance tests")
-    config.addinivalue_line("markers", "contract: tests against external contracts (P01)")
-    config.addinivalue_line("markers", "integration: cross-module integration tests")
-    config.addinivalue_line("markers", "property: invariant/property-based tests")
-    config.addinivalue_line("markers", "regression: regression tests for fixed defects")
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    """Apply the documented test-tier marker from the test directory."""
+    markers = {
+        "integration": "integration",
+        "contract": "contract",
+        "property": "property",
+        "regression": "regression",
+        "adversarial": "adversarial",
+        "acceptance": "acceptance",
+    }
+    for item in items:
+        try:
+            relative = item.path.relative_to(_REPO_ROOT)
+        except ValueError:
+            continue
+        if len(relative.parts) >= 2 and relative.parts[0] == "tests":
+            marker_name = markers.get(relative.parts[1])
+            if marker_name is not None:
+                item.add_marker(getattr(pytest.mark, marker_name))

@@ -1,38 +1,51 @@
 # QRSIP — CHANGELOG.md
 
-Changelog for QRSIP.
-
-Format: Keep a Changelog (https://keepachangelog.com/)
+All notable changes to QRSIP are recorded here. The project follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## Unreleased
 
 ### Added
-- **Phase 0 (Foundation)**:
-  - CLI entrypoint (`qrsip init`, `qrsip doctor`, `qrsip status`).
-  - Configuration loader with environment variable overrides (`QRSIP_*`) and secret sanitization.
-  - Fail-closed error hierarchy rooted in `QRSIPError` with structured context dictionaries.
-  - Structured JSON logging (`StructuredFormatter`) and human console output with `timed_event`.
-  - Non-destructive diagnostic health checks (`Doctor`).
-  - `StoragePort` protocol and portable `FileStorage` implementation with canonical JSON serialization and SHA-256 content addressing.
-  - Development toolchain configs (Ruff, strict mypy, Bandit, Pytest) and container definitions (`Dockerfile`, `docker-compose.yml`).
-- **Phase 1 (Domain Core)**:
-  - Immutable Pydantic v2 `BaseEntity` with stable identity, semantic versioning, and UTC timestamps.
-  - Research domain entities: `ResearchQuestion` (FR-001), `Hypothesis` (FR-002), `StrategySpec` (FR-003), `DatasetRef` (FR-004), `Experiment` and `ExperimentRun` (FR-005).
-  - 12-state research lifecycle machine with `require_transition` fail-closed gate.
-  - Append-only `ResearchRegistry` backed by `StoragePort` with conflict detection on identical keys.
-  - Result envelopes: `ValidationResult`, `PromotionDecision` (human approval gate), and `ResearchReport`.
-- **Phase 2 (Data Layer)**:
-  - `P01DataContract` market data protocol and `Bar` dataclass (close-timestamped in UTC).
-  - Fail-closed bar validator (`validate_bars`) for OHLC bounds, duplicate timestamps, ordering, and non-negativity.
-  - `MarketDataset` and `PointInTimeView` enforcing strict causality and raising `LookAheadError` on future data inspection.
-  - Deterministic test fixtures (`FixtureP01Provider`, `build_fixture_bars`).
-- **Phase 3 (Quant Layer)**:
-  - Causal features (SMA, EMA, simple/log returns, rolling volatility, momentum) with explicit warm-up `None` values.
-  - Strategy signal protocol (`SignalStrategy`), `Signal` class, and `MovingAverageCrossStrategy`.
-  - Financial performance metrics (Sharpe, Sortino, Calmar, Max Drawdown, Win Rate, Profit Factor, `PerformanceMetrics`) with fail-closed handling for undefined ratios.
-- **Documentation**:
-  - Full synchronization of `README.md`, `PROJECT_STATUS.md`, and architecture docs with actual current implementation state.
 
-### Changed
-- Updated `PROJECT_STATUS.md` with complete layer matrix, current test counts, and explicit inventory of in-progress simulation and validation files.
-- Expanded `README.md` to comprehensively document architecture, data boundaries, point-in-time safety, execution timing, testing evidence, and development instructions.
+- Complete L0–L7 research-platform architecture with downward-only dependencies.
+- Immutable domain entities, lifecycle validation, registry persistence, and human-controlled promotion records.
+- P01 data contract, point-in-time market datasets, deterministic synthetic fixtures, and checksum-bound Parquet loading.
+- Causal features, signal strategies, financial metrics, deterministic next-bar execution, explicit commissions/slippage, portfolio accounting, and risk controls.
+- L5 validation evidence for significance, Deflated Sharpe Ratio, look-ahead bias, survivorship, multiple testing, parameter sensitivity, and walk-forward robustness.
+- L6 canonical run artifacts, Markdown/JSON research reports, deterministic rerun verification, and experiment lineage.
+- L7 research CLI workflows: `experiment run`, `experiment rerun`, `report show`, and `promote`.
+- Unit, contract, property, adversarial, integration, acceptance, and regression test tiers.
+- Developer tooling: strict mypy, Ruff, Bandit, pip-audit, Make targets, Docker definitions, and GitHub Actions workflows.
+- Professional repository documentation, career engineering materials, security policy, contribution guide, and acceptance provenance matrix.
+
+### Verified locally
+
+- 352 automated tests pass.
+- Unit, contract, property, adversarial, integration, acceptance, and regression suites pass.
+- `ruff check src tests`, `ruff format --check src tests`, and `mypy src` pass.
+- Bandit reports no medium- or high-severity findings.
+- The frozen dependency audit reports no known vulnerabilities after excluding the local package from PyPI resolution.
+- The fixture-backed research workflow produces canonical artifacts and reproduces the same result digest on rerun.
+- Failed validation cannot be automatically approved.
+
+### External acceptance status
+
+- Clean-container acceptance: blocked because no supported container runtime is available in the current environment.
+- Current-tree GitHub Actions CI and Security execution: blocked because no authenticated workflow trigger is available; prior public runs apply to an older commit.
+- Canonical production P01 reference: unresolved because the repository contains the contract and adapter but no authoritative production artifact, manifest, or canonical checksum.
+
+### Known limitations
+
+- QRSIP is Alpha-stage research software, not a live trading or production deployment.
+- Synthetic fixtures are explicitly labeled and are not production market data.
+- The checked-in master specification is an incomplete historical preamble; missing section text was not reconstructed.
+- Licensing remains unresolved under ADR-0004; no license file is added by this release preparation.
+
+### Deferred
+
+- FastAPI external API.
+- PostgreSQL storage.
+- Dashboard/UI.
+- AI Research Copilot.
+- Rust performance layer.
+- Live broker execution and automated trading.
+- P03 functionality and distributed microservices.

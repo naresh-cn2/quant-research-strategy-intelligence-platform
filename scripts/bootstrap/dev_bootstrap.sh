@@ -51,7 +51,7 @@ else
 fi
 
 # Freeze for reproducibility + security checks.
-pip freeze | sed 's/=*//' > "${REPO_ROOT}/requirements-frozen.txt"
+pip freeze --exclude-editable | sed 's/=*//' > "${REPO_ROOT}/requirements-frozen.txt"
 
 # ------------------------------------------------------------------
 # 3. Verification

@@ -32,7 +32,7 @@ help:
 
 bootstrap:
 	@pip install -e ".[dev]" --quiet
-	@pip freeze | sed 's/=*//' > requirements-frozen.txt
+	@pip freeze --exclude-editable | sed 's/=*//' > requirements-frozen.txt
 	@echo "bootstrap complete"
 
 test:

@@ -31,6 +31,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
+          pip freeze --exclude-editable | sed 's/=*//' > requirements-frozen.txt
 
       - name: Free-threaded / build sanity
         run: python -c "import qrsip; print(qrsip.__version__)"
@@ -39,7 +40,7 @@ jobs:
         run: bandit -r src -c pyproject.toml -ll
 
       - name: Dependency audit
-        run: pip-audit -r requirements-frozen.txt || true
+        run: pip-audit -r requirements-frozen.txt
 
       - name: Format check
         run: ruff format --check src tests
@@ -67,6 +68,9 @@ jobs:
 
       - name: Adversarial tests
         run: pytest -v -m adversarial
+
+      - name: Acceptance tests
+        run: pytest -v -m acceptance
 
       - name: Build wheel
         run: python -m build --outdir dist

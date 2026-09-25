@@ -35,6 +35,7 @@ dev = [
     "types-PyYAML>=6.0,<7",
     "bandit>=1.7,<2",
     "pip-audit>=2.6,<3",
+    "build>=1.2,<2",
 ]
 
 [project.scripts]

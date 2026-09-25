@@ -1,105 +1,132 @@
-# QRSIP — Quantitative Research & Strategy Intelligence Platform
+# QRSIP
 
-> **Project Status:** `IN PROGRESS / NOT COMPLETE` (Alpha stage)
->
-> **Development Phase:** Phases 0–7 implemented; final environment acceptance verification pending.
->
-> **Test Suite:** 352 automated tests passing in the repository environment.
->
-> *Notice: QRSIP is not production-ready and is not yet verified for live portfolio management. The current verification is local; a clean-container acceptance run and CI execution remain outstanding.*
+## Quantitative Research & Strategy Intelligence Platform
 
----
+[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Ruff](https://img.shields.io/badge/lint-ruff-261230?logo=ruff&logoColor=white)](https://docs.astral.sh/ruff/)
+[![Mypy](https://img.shields.io/badge/types-mypy-2a6db2?logo=mypy&logoColor=white)](https://mypy-lang.org/)
+[![Security](https://img.shields.io/badge/security-bandit%20%7C%20pip--audit-6b4f8a?logo=githubactions&logoColor=white)](.github/workflows/security.yml)
 
-## 1. What QRSIP Is
+> **Project status:** Alpha-stage research platform. L0–L7 are implemented and locally verified; final external acceptance evidence remains incomplete. QRSIP is not a live trading system and makes no claim of production performance or profitability.
 
-**QRSIP** (Quantitative Research & Strategy Intelligence Platform — Project P02) is a research-grade, deterministic, and auditable Python system designed to transform quantitative trading hypotheses into verified, bias-tested trading strategies.
+QRSIP is a Python research-software project for turning quantitative hypotheses into deterministic, auditable experiments. It combines point-in-time data access, explicit execution costs, portfolio accounting, risk controls, statistical validation, reproducibility artifacts, and a human-controlled promotion decision.
 
-It provides the computational and validation scaffolding that sits between raw historical market data infrastructure and future live execution systems:
+## Portfolio map
 
-$$\text{Research Question} \longrightarrow \text{Hypothesis} \longrightarrow \text{Strategy Spec} \longrightarrow \text{Point-in-Time Data} \longrightarrow \text{Simulation} \longrightarrow \text{Validation} \longrightarrow \text{Research Report} \longrightarrow \text{Human Decision}$$
+- [Project overview](docs/career/PROJECT_OVERVIEW.md)
+- [Engineering case study](docs/career/CASE_STUDY.md)
+- [Engineering skills matrix](docs/career/ENGINEERING_SKILLS.md)
+- [Architecture overview](docs/architecture/overview.md)
+- [Acceptance provenance matrix](docs/operations/acceptance_provenance_matrix.md)
+- [Project status](PROJECT_STATUS.md)
+- [Security policy](SECURITY.md)
+- [Contributing guide](CONTRIBUTING.md)
 
-### What This Is Not
-* **Not a toy tutorial backtester**: It does not make unrealistic assumptions like perfect fills, zero commissions, or instant zero-latency executions.
-* **Not an ad-hoc Jupyter notebook collection**: Experiments are reproducible entities with immutable configs, dataset manifests, and seeds.
-* **Not a live broker execution engine**: Live trading is strictly out of scope (reserved for downstream platforms).
-* **Not a dashboard UI**: Unaudited visual dashboards are deliberately excluded in favor of auditable, versioned research reports.
+## What problem does it solve?
 
----
+Quantitative research results are easy to overstate when the experiment has hidden data leakage, perfect fills, omitted costs, broken accounting, missing risk controls, or no way to reproduce the original run. QRSIP makes those constraints explicit in code and tests.
 
-## 2. Why It Exists
+The project supports this workflow:
 
-Most quantitative strategy failures originate from subtle research methodological errors:
-1. **Look-ahead bias**: Strategy logic observing information before it was officially published or closed.
-2. **Unrealistic fill assumptions**: Assuming market orders fill at the decision bar's close price or at zero spread/cost.
-3. **Broken accounting**: Fabricating cash or valuing unmarked positions without fail-closed accounting identities.
-4. **Data leakage & p-hacking**: Running multiple parameter variations and selecting optimal outcomes without multiple-testing penalties (such as Deflated Sharpe Ratios).
-5. **Irreproducibility**: Inability to rerun a historical backtest and obtain bit-for-bit identical results due to untracked environment dependencies or random seeds.
+```text
+Research question
+      ↓
+Hypothesis and strategy specification
+      ↓
+Point-in-time dataset and data-quality checks
+      ↓
+Causal features and signals
+      ↓
+Deterministic simulation, costs, portfolio, and risk
+      ↓
+Validation and robustness evidence
+      ↓
+Research report and human decision
+```
 
-QRSIP exists to enforce mathematical and software engineering rigor to eliminate these failure modes structurally.
+QRSIP does not ingest raw vendor data, connect to a broker, or represent synthetic fixtures as production data. It consumes data through the narrow P01 contract and keeps the external production-data boundary explicit.
 
----
-
-## 3. Core Architectural Principles
-
-* **Fail-Closed by Design**: If required data, configuration, marks, or validation rules are missing or ambiguous, the system raises an explicit `QRSIPError` with actionable structured context. It never guesses or fabricates prices.
-* **Point-in-Time Safety**: Strict causality is enforced at the data layer. Decisions at timestamp $T$ can only view market data up to $T$.
-* **Deterministic Execution**: Given the same dataset, configuration, and random seed, simulation outputs are bit-for-bit identical.
-* **Explicit Cost & Slippage Modeling**: Commissions (basis points and fixed fees) and slippage penalties are explicitly applied to fills.
-* **Verified Accounting Invariants**: Every cash movement and fill is accounted for via double-entry arithmetic.
-* **Separation of Concerns**: Strategy logic never touches disk storage, network sockets, or presentation interfaces.
-* **Human-in-the-Loop Promotion**: Machine-automated pipelines can reject candidate strategies, but promotion to production candidacy requires explicit human sign-off (`PromotionDecision`).
-
----
-
-## 4. Architecture & Layer Model
-
-The system follows a strict downward-only dependency model across 8 conceptual layers:
+## Architecture
 
 ```mermaid
 flowchart TD
-    L7["L7: Presentation (CLI)"] --> L6["L6: Intelligence & Reports"]
-    L6 --> L5["L5: Validation (Significance & Robustness)"]
-    L5 --> L4["L4: Simulation (Execution, Portfolio, Risk)"]
-    L4 --> L3["L3: Quant (Features, Signals, Metrics)"]
-    L3 --> L2["L2: Data (P01 Contract, Point-in-Time Dataset)"]
-    L2 --> L1["L1: Domain (Entities, Lifecycle, Registry)"]
-    L1 --> L0["L0: Infrastructure (Errors, Config, Logging, StoragePort)"]
+    L7["L7 Presentation\nCLI and reports"] --> L6["L6 Intelligence\nExperiment artifacts and reproduction"]
+    L6 --> L5["L5 Validation\nBias, robustness, and statistics"]
+    L5 --> L4["L4 Simulation\nExecution, portfolio, and risk"]
+    L4 --> L3["L3 Quant\nFeatures, signals, and metrics"]
+    L3 --> L2["L2 Data\nP01 contract and point-in-time datasets"]
+    L2 --> L1["L1 Domain\nResearch entities and lifecycle"]
+    L1 --> L0["L0 Infrastructure\nConfiguration, storage, and diagnostics"]
 ```
 
-| Layer | Responsibility | Primary Modules | Implementation Status |
-|---|---|---|---|
-| **L0 Infrastructure** | Base exceptions, YAML configuration, structured logging, system health checks, portable file storage | `errors.py`, `config.py`, `logging.py`, `doctor.py`, `infrastructure/storage.py` | **Implemented & locally tested** |
-| **L1 Domain** | Research entities, 12-state research lifecycle state machine, append-only entity registry | `domain/base.py`, `domain/entities.py`, `domain/lifecycle.py`, `domain/registry.py`, `domain/results.py` | **Implemented & locally tested** |
-| **L2 Data** | P01 boundary, bar validation, point-in-time views, deterministic fixtures, checksum-bound Parquet adapter | `data/contract.py`, `data/validation.py`, `data/dataset.py`, `data/fixtures.py`, `data/parquet.py` | **Implemented & locally tested** |
-| **L3 Quant** | Causal feature calculation, signal strategy protocols, fail-closed financial metrics | `quant/features.py`, `quant/signals.py`, `quant/metrics.py` | **Implemented & locally tested** |
-| **L4 Simulation** | Order models, deterministic next-bar fill simulator, portfolio accounting, risk engine, event loop | `simulation/execution.py`, `simulation/portfolio.py`, `simulation/risk.py`, `simulation/engine.py` | **Implemented & locally tested** |
-| **L5 Validation** | Significance math, Deflated Sharpe Ratio, bias checks, multiple testing, sensitivity, walk-forward evidence | `validation/` | **Implemented & locally tested** |
-| **L6 Intelligence** | Research artifacts, lineage joins, deterministic Markdown/JSON reports, reproduction | `intelligence.py`, `domain/results.py` | **Implemented & locally tested** |
-| **L7 Presentation** | Research CLI: experiment run/rerun, report show, human promotion decision | `cli.py` | **Implemented & locally tested** |
+Dependencies flow downward only. Higher layers orchestrate lower-layer contracts; they do not move financial calculations into the CLI or make domain objects depend on storage implementations. The boundary prevents presentation concerns, infrastructure details, and research logic from becoming coupled.
+
+The detailed layer responsibilities and evidence links are in [`docs/architecture/overview.md`](docs/architecture/overview.md).
+
+## Research and engineering controls
+
+| Control | Implementation evidence |
+|---|---|
+| Point-in-time causality | `PointInTimeView` and `LookAheadError` in `src/qrsip/data/dataset.py` |
+| Deterministic signal/fill timing | ADR-0005; decision at close T, fill at next open T+1 |
+| Explicit costs | `CostModel` for commissions, fixed fees, and slippage |
+| Accounting invariant | `Portfolio.assert_accounting_identity()` |
+| Risk controls | `RiskEngine`, order limits, exposure limits, and drawdown halt |
+| Dataset identity | Dataset descriptors, manifests, SHA-256 checksums, and row counts |
+| Reproducibility | Resolved experiment configuration and canonical result digests |
+| Research integrity | Bias checks, robustness evidence, explicit limitations, and no automatic promotion |
+| Human control | `PromotionDecision` and `qrsip promote` require an explicit human decision |
+
+These are implementation controls. They do not establish investment merit, production data quality, or live-trading performance.
+
+## Current implementation evidence
+
+The repository contains:
+
+- 352 passing automated tests across unit, contract, property, adversarial, integration, acceptance, and regression suites.
+- A local verification harness at `scripts/validation/run_checks.sh`.
+- Ruff formatting and lint checks.
+- Strict mypy checking.
+- Bandit and pip-audit checks.
+- Docker and Docker Compose definitions.
+- GitHub Actions CI and Security workflows.
+- Markdown and JSON research reports.
+- Deterministic run and rerun artifacts.
+- A human-controlled promotion gate.
+
+The complete local evidence record is in [`PROJECT_STATUS.md`](PROJECT_STATUS.md) and [`reports/verification/`](reports/verification/).
 
 ---
 
-## 5. P01 $\to$ P02 Relationship & Data Boundary
+## Detailed implementation
+
+The implementation is organized so each concern has one enforcement point:
+
+- **P01 → P02 data boundary** — P02 consumes validated bars through `P01DataContract`; fixtures are explicitly synthetic and the repository does not claim a canonical production dataset.
+- **Point-in-time safety** — `PointInTimeView` exposes only observations available at its decision clock and raises `LookAheadError` for future reads.
+- **Execution semantics** — decisions are made at close T and fills occur at the next bar open, with explicit commissions and slippage.
+- **Accounting and risk** — portfolio state verifies cash/position identities and the risk engine enforces order, position, exposure, and drawdown controls.
+- **Validation and reporting** — L5 produces immutable evidence and L6 writes deterministic Markdown/JSON artifacts that retain limitations and a human decision boundary.
 
 QRSIP (P02) does **not** ingest raw vendor data, clean messy exchange feeds, or manage real-time websocket connections. That responsibility belongs strictly to upstream market data infrastructure (**P01**).
 
-* P02 consumes market data exclusively through the [`P01DataContract`](file:///home/mrcn2/quant-research-strategy-intelligence-platform/src/qrsip/data/contract.py) protocol.
-* Data is exchanged as validated, ordered sequences of [`Bar`](file:///home/mrcn2/quant-research-strategy-intelligence-platform/src/qrsip/data/contract.py) records, where `timestamp` represents the UTC **close** of the bar.
-* For standalone testing and development without a live P01 instance, P02 provides deterministic fixtures via [`FixtureP01Provider`](file:///home/mrcn2/quant-research-strategy-intelligence-platform/src/qrsip/data/fixtures.py), explicitly labeled as test fixtures (ADR-0007).
+* P02 consumes market data exclusively through the [`P01DataContract`](src/qrsip/data/contract.py) protocol.
+* Data is exchanged as validated, ordered sequences of [`Bar`](src/qrsip/data/contract.py) records, where `timestamp` represents the UTC **close** of the bar.
+* For standalone testing and development without a live P01 instance, P02 provides deterministic fixtures via [`FixtureP01Provider`](src/qrsip/data/fixtures.py), explicitly labeled as test fixtures (ADR-0007).
 
 ---
 
-## 6. Point-in-Time Safety (Zero Look-Ahead Bias)
+## Point-in-Time Safety (Zero Look-Ahead Bias)
 
-To prevent look-ahead bias, strategy code never interacts with raw bar arrays or future data slices. All data access must pass through [`PointInTimeView`](file:///home/mrcn2/quant-research-strategy-intelligence-platform/src/qrsip/data/dataset.py):
+To prevent look-ahead bias, strategy code never interacts with raw bar arrays or future data slices. All data access must pass through [`PointInTimeView`](src/qrsip/data/dataset.py):
 
 * A bar with closing timestamp $T$ becomes visible to the strategy **only** when `as_of >= T`.
-* Any query or indexing operation attempting to inspect bars with timestamps $> T$ immediately raises a fail-closed [`LookAheadError`](file:///home/mrcn2/quant-research-strategy-intelligence-platform/src/qrsip/data/dataset.py).
-* Causal feature calculations ([`features.py`](file:///home/mrcn2/quant-research-strategy-intelligence-platform/src/qrsip/quant/features.py)) require explicit warm-up periods and return `None` during warm-up rather than backfilling from future data.
+* Any query or indexing operation attempting to inspect bars with timestamps $> T$ immediately raises a fail-closed [`LookAheadError`](src/qrsip/data/dataset.py).
+* Causal feature calculations ([`features.py`](src/qrsip/quant/features.py)) require explicit warm-up periods and return `None` during warm-up rather than backfilling from future data.
 
 ---
 
-## 7. Deterministic Execution Model (ADR-0005)
+## Deterministic Execution Model (ADR-0005)
 
 To guarantee realism, QRSIP adheres to an explicit timing convention:
 
@@ -111,61 +138,61 @@ To guarantee realism, QRSIP adheres to an explicit timing convention:
 
 ---
 
-## 8. Portfolio Accounting & Invariants (spec §25)
+## Portfolio Accounting & Invariants (spec §25)
 
-Simulation accounting is cash-first and double-entry ([`portfolio.py`](file:///home/mrcn2/quant-research-strategy-intelligence-platform/src/qrsip/simulation/portfolio.py)):
+Simulation accounting is cash-first and double-entry ([`portfolio.py`](src/qrsip/simulation/portfolio.py)):
 
 * **Verified Equity Identity**:
   $$\text{equity} = \text{initial\_cash} + \text{realized\_pnl} + \text{unrealized\_pnl} - \text{commissions}$$
-* **No Unmarked Valuation**: Every open position must have a verifiable current market price. If a mark is missing, valuation fails closed with [`PortfolioError`](file:///home/mrcn2/quant-research-strategy-intelligence-platform/src/qrsip/errors.py) rather than defaulting to cost basis.
+* **No Unmarked Valuation**: Every open position must have a verifiable current market price. If a mark is missing, valuation fails closed with [`PortfolioError`](src/qrsip/errors.py) rather than defaulting to cost basis.
 * **Cash Solvency**: Purchases exceeding available cash are rejected rather than allowing negative cash balances.
 
 ---
 
-## 9. Current Testing Evidence
+## Current Testing Evidence
 
 The platform currently includes **352 passing automated tests** in the repository environment:
 
 ```bash
 $ .venv/bin/pytest -q
-350 passed
+352 passed
 ```
 
 Test tiers currently contain 338 unit tests, 3 contract tests, 2 property tests, 4 adversarial tests, 2 integration tests, 1 acceptance test, and 2 regression tests.
 
 * **Static analysis:** `ruff check src tests`, `ruff format --check src tests`, and `mypy src` pass.
 * **Security:** `bandit -r src -c pyproject.toml -ll` reports no medium/high issues.
-* **CI:** Workflow files are present; execution of GitHub Actions has not been performed in this environment.
+* **CI:** Workflow files are present. The latest public CI run on `27a9596` concluded with a failure at the integration-test step; the latest public Security run concluded with a failure at dependency audit. Current repairs are local and uncommitted, so a new external run is not yet available.
 
 ---
 
-## 10. Current Implementation Status & Known Limitations
+## Current Implementation Status & Known Limitations
 
 ### Current Status
 * **Phases 0–7 (L0 Infrastructure through L7 Presentation):** Implemented and locally tested.
 * **Research workflow:** YAML experiment execution, canonical run artifacts, deterministic reruns, Markdown/JSON reports, and human promotion decisions are implemented.
-* **Verification:** 350 tests pass locally; clean-container acceptance and CI execution remain outstanding.
+* **Verification:** 352 tests pass locally; clean-container acceptance and external CI execution remain outstanding.
 
 ### Known Limitations & Defects
 * **Fresh-environment acceptance:** The repository acceptance test is executable, but a clean-container run has not been performed in this environment.
-* **CI execution:** Workflow configuration exists, but GitHub Actions has not been executed from this environment.
+* **CI execution:** The latest public CI/Security runs were observed and failed on the previous remote baseline; the repaired tree has not yet been executed externally.
 * **Synthetic fixture default:** The local CLI workflow uses explicitly labeled deterministic fixtures; real P01 production data is an external dependency and is not represented by these fixtures.
 * **PostgreSQL, FastAPI, AI copilot, Rust performance layer, dashboard, and live execution:** Deferred or explicitly excluded by the existing architecture and ADRs.
 
 ---
 
-## 11. Remaining Engineering Work
+## External Acceptance Evidence
 
-The current in-scope implementation is locally verified. Remaining release verification is:
-1. Run the acceptance workflow in a clean, reproducible environment.
-2. Execute the configured CI workflows and record their result.
-3. Replace the synthetic fixture dataset with the external, checksum-bound P01 production reference when that artifact is available.
+The current in-scope implementation is locally verified. Final release evidence still requires:
+1. A successful clean-container run of the repository acceptance workflow.
+2. Successful current-tree GitHub Actions CI and Security runs.
+3. Verification of an authoritative external P01 production reference if that artifact and its canonical identity are supplied; the repository does not currently define one.
 
 The deferred systems listed above are not implementation defects for P02.
 
 ---
 
-## 12. Local Development & Quick Start
+## Local Development & Quick Start
 
 ### Prerequisites
 * Python 3.11 or Python 3.12
@@ -233,7 +260,7 @@ qrsip report show --experiment-id EXAMPLE-FIXTURE-RESEARCH --artifacts artifacts
 qrsip promote --experiment-id EXAMPLE-FIXTURE-RESEARCH --decision REJECT --reviewer reviewer --rationale "Review required before any promotion" --artifacts artifacts
 ```
 
-## 13. Project Maturity & License
+## Project Maturity & License
 
 * **Maturity**: Alpha (`Development Status :: 3 - Alpha`).
 * **License**: Proprietary (licensing decision pending per ADR-0004).

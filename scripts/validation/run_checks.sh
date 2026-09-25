@@ -85,7 +85,7 @@ fi
     echo "    \"${NAMES[$i]}\": \"${RESULTS[$i]}\"$comma"
   done
   echo "  },"
-  echo "  \"overall\": $([ $OVERALL -eq 0 ] && echo '\"pass\"' || echo '\"fail\"')"
+  echo "  \"overall\": $([ $OVERALL -eq 0 ] && echo '"pass"' || echo '"fail"')"
   echo "}"
 } >"$OUT_DIR/local_checks.json"
 

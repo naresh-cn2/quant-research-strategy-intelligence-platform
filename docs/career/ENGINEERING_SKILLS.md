@@ -1,0 +1,120 @@
+# QRSIP Engineering Skills Matrix
+
+This matrix maps professional skills to evidence present in the repository. It excludes capabilities that are deferred or not implemented.
+
+## Software engineering
+
+| Skill | Repository evidence |
+|---|---|
+| Python engineering | `src/qrsip/`, `pyproject.toml`, `src-layout` package, typed public interfaces |
+| Modular architecture | L0–L7 package structure and `docs/architecture/overview.md` |
+| Domain modeling | `src/qrsip/domain/entities.py`, `results.py`, `lifecycle.py` |
+| Typed interfaces | Pydantic models, protocols, dataclasses, strict mypy configuration |
+| Error handling | `src/qrsip/errors.py` and `QRSIPError` structured context |
+| Deterministic systems | Fixture generation, canonical JSON, stable ordering, deterministic rerun tests |
+| CLI engineering | `src/qrsip/cli.py` and `qrsip` entry point in `pyproject.toml` |
+| Packaging and dependencies | `pyproject.toml`, `Makefile`, `requirements-frozen.txt`, ADR-0001 |
+| API boundary design | `StoragePort` and `P01DataContract` protocols |
+
+## Quantitative engineering
+
+| Skill | Repository evidence |
+|---|---|
+| OHLCV data modeling | `src/qrsip/data/contract.py` and `Bar` |
+| Point-in-time data access | `MarketDataset`, `PointInTimeView`, `LookAheadError` |
+| Causal feature engineering | `src/qrsip/quant/features.py` |
+| Strategy signal design | `SignalStrategy`, `MovingAverageCrossStrategy`, `ConstantStrategy` |
+| Signal/fill timing | ADR-0005 and execution tests for close-T/next-open-T+1 behavior |
+| Order and fill simulation | `src/qrsip/simulation/execution.py` |
+| Commission and slippage modeling | `CostModel` and execution tests |
+| Portfolio accounting | `Portfolio`, `Position`, accounting identity tests |
+| Risk controls | `RiskEngine`, `RiskLimits`, drawdown circuit breaker tests |
+| Quantitative metrics | Sharpe, Sortino, Calmar, drawdown, win rate, profit factor |
+| Statistical validation | `src/qrsip/validation/stats.py` and validation tests |
+| Multiple-testing controls | Holm correction in `src/qrsip/validation/multiple_testing.py` |
+| Deflated Sharpe Ratio | `src/qrsip/validation/stats.py` and `tests/unit/test_validation.py` |
+| Bias and robustness analysis | L5 bias, sensitivity, survivorship, and walk-forward modules |
+
+## Data engineering
+
+| Skill | Repository evidence |
+|---|---|
+| Dataset descriptors | `DatasetDescriptor` and `DatasetHandle` |
+| Content addressing | Canonical JSON plus SHA-256 in `FileStorage` and the Parquet adapter |
+| Dataset manifests | `src/qrsip/data/parquet.py` manifest contract and tests |
+| Lineage | Experiment, run, dataset, report, and validation records in `src/qrsip/intelligence.py` |
+| Schema validation | OHLCV schema and Parquet column checks |
+| Data-quality validation | `src/qrsip/data/validation.py` and data tests |
+| Point-in-time datasets | `MarketDataset` and `PointInTimeView` |
+| External data boundary | P01 contract, fixtures, and Parquet adapter |
+
+## Research engineering
+
+| Skill | Repository evidence |
+|---|---|
+| Research question and hypothesis modeling | `ResearchQuestion`, `Hypothesis` |
+| Experiment design | `StrategySpec`, `DatasetRef`, `Experiment`, `ExperimentRun` |
+| Experiment orchestration | `src/qrsip/intelligence.py` |
+| Validation evidence | `ValidationSummary` and L5 validation runner |
+| Look-ahead analysis | `verify_look_ahead` |
+| Survivorship analysis | `verify_survivorship` |
+| Robustness analysis | Parameter sensitivity and walk-forward validation |
+| Research reporting | `ResearchReport`, Markdown rendering, JSON artifacts |
+| Human decision control | `PromotionDecision` and `qrsip promote` |
+| Reproducibility | Resolved configuration, dataset checksum, seed, environment, and digest rerun |
+
+## Test engineering
+
+| Skill | Repository evidence |
+|---|---|
+| Unit testing | `tests/unit/` |
+| Integration testing | `tests/integration/` |
+| Contract testing | `tests/contract/` and P01 contract tests |
+| Property/invariant testing | `tests/property/` and canonical stability checks |
+| Regression testing | `tests/regression/` and digest-corruption coverage |
+| Adversarial testing | `tests/adversarial/` for tampering and gate bypass attempts |
+| Acceptance testing | `tests/acceptance/` end-to-end run/report/rerun workflow |
+| Test discoverability | `tests/conftest.py` assigns directory-based markers |
+| Numerical boundary coverage | Validation and metric boundary tests |
+| Failure-mode testing | Fail-closed tests for malformed data, invalid configurations, and missing artifacts |
+
+## DevOps and tooling
+
+| Skill | Repository evidence |
+|---|---|
+| Make-based task automation | `Makefile` targets for test, lint, typecheck, security, build, and CI |
+| Containerization | `Dockerfile` and `docker-compose.yml` |
+| GitHub Actions | `.github/workflows/ci.yml` and `security.yml` |
+| Continuous integration | Tests, Ruff, mypy, Bandit, pip-audit, and wheel build in CI |
+| Dependency freezing | `requirements-frozen.txt` generated by bootstrap and CI |
+| Static typing | Strict mypy configuration |
+| Formatting and linting | Ruff configuration and checks |
+| Build packaging | `python -m build` in Makefile and CI |
+
+## Security
+
+| Skill | Repository evidence |
+|---|---|
+| Static security analysis | Bandit in local validation and GitHub Actions |
+| Dependency audit | pip-audit against frozen requirements |
+| Secret scanning workflow | gitleaks job in `.github/workflows/security.yml` |
+| Fail-closed security behavior | Structured QRSIP errors and explicit gate failures |
+| Safe storage boundaries | Path validation and atomic `FileStorage` writes |
+| Supply-chain awareness | Pinned dependency freeze and audit workflow |
+| Human promotion control | Automation cannot approve failed validation gates |
+
+## Engineering governance
+
+| Skill | Repository evidence |
+|---|---|
+| Architecture decision records | `docs/decisions/adr_0001_0002.md`, `adr_0003_0010.md` |
+| Acceptance provenance | `docs/operations/acceptance_provenance_matrix.md` |
+| Operational status reporting | `PROJECT_STATUS.md` |
+| Release checklist | `docs/operations/release_checklist.md` |
+| Research integrity controls | Bias checks, robustness evidence, explicit limitations, and human decision gate |
+| Scope governance | Deferred capabilities documented in README, status, and ADRs |
+| Evidence-based claims | Acceptance matrix distinguishes local, external, unresolved, and deferred states |
+
+## Skills not claimed
+
+This repository does not demonstrate live broker execution, live trading, production P01 deployment, profitability, external users, production deployment, FastAPI, PostgreSQL, dashboard development, AI copilot development, Rust implementation, or P03 functionality. Those capabilities are outside the current evidence boundary.

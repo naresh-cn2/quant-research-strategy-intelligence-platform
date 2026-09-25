@@ -3,18 +3,20 @@
 # This is the operational source of truth for the P02 implementation.
 # It is continuously updated to reflect actual code, tests, and git state.
 #
-# Do not claim completion without evidence. See spec §35.
+# Do not claim completion without evidence. See the acceptance provenance matrix.
 
 # P02 — Quantitative Research & Strategy Intelligence Platform
 # ============================================================
 
-**Status:** IN PROGRESS — NOT COMPLETE (L0–L7 implemented and locally verified; clean-environment acceptance and CI execution pending)
+**Status:** BLOCKED — local implementation and verification pass; external acceptance gates remain incomplete (container runtime, external CI rerun, and production P01 reference)
 
 **Current Phase:** Final acceptance verification
 
-**Last Verified Baseline Commit:** `e4f45e6` ("docs: synchronize P02 architecture and project status")
+**Last Verified Baseline Commit:** `27a9596` (latest public remote commit; current acceptance repairs are uncommitted)
 
 **Last Verification Timestamp:** 2026-09-25
+
+**Acceptance provenance:** See [`docs/operations/acceptance_provenance_matrix.md`](docs/operations/acceptance_provenance_matrix.md).
 
 ---
 
@@ -77,7 +79,7 @@
   * `mypy src`: Passing on all 36 source files.
 * **Security Audit Status:**
   * `bandit -r src -c pyproject.toml -ll`: Passing (0 medium/high issues).
-* **CI Status:** Workflow files are present; GitHub Actions execution has not been performed in this environment.
+* **Local verification:** The repository harness passes all tiers, strict static checks, Bandit, and pip-audit after the dependency-freeze correction.
 
 ---
 
@@ -108,7 +110,7 @@
 
 ## 4. Acceptance Criteria & Quality Gates Still Outstanding
 
-Per spec §50, the platform is considered **working** only when all of the following hold:
+According to the repository acceptance checklist, the platform is considered **working** only when all of the following hold:
 - [x] Source code exists and architecture is implemented (L0–L7)
 - [x] Storage contracts work (`StoragePort` + `FileStorage` verified with SHA-256 canonical JSON)
 - [x] P01 data contract works (enforced via `P01DataContract`, fixtures, and `PointInTimeView`)
@@ -119,10 +121,10 @@ Per spec §50, the platform is considered **working** only when all of the follo
 - [x] Bias checks, multiple-testing correction, sensitivity, and walk-forward evidence are tested
 - [x] Adversarial, property, contract, integration, acceptance, and regression tests are executable
 - [x] Reproduction is verified by canonical digest comparison
-- [x] CI is configured (`.github/workflows/ci.yml`, `security.yml` exist)
-- [x] Documentation matches the locally verified implementation
-- [ ] Fresh-environment acceptance test passes in a clean container
-- [ ] CI workflows have been executed and recorded in an external CI system
+- [x] Local verification harness passes (`scripts/validation/run_checks.sh`)
+- [ ] Fresh-environment acceptance test passes in a clean container (blocked: Docker/Podman/nerdctl unavailable)
+- [ ] CI workflows have passed on the current repaired tree (blocked: latest public CI/Security runs failed on `27a9596`; no authenticated run trigger available)
+- [ ] External checksum-bound P01 production reference is verified (blocked: no production dataset source/checksum/artifact is documented or available)
 
 ---
 
@@ -152,7 +154,7 @@ Per the P02 architecture specification and ADRs:
 
 ## 7. Release Verification Work
 
-The current in-scope implementation is locally verified. Remaining release verification is:
-1. Run the acceptance workflow in a clean, reproducible environment.
-2. Execute the configured CI workflows and record their result.
-3. Replace the synthetic fixture dataset with the external, checksum-bound P01 production reference when that artifact is available.
+The current in-scope implementation is locally verified. Final acceptance is blocked only by external evidence gates:
+1. Run the acceptance workflow in a clean, reproducible container.
+2. Push or otherwise trigger the repaired workflows and record successful GitHub Actions results.
+3. Supply an authoritative external P01 production artifact and manifest, if that artifact is required by a future acceptance decision, and verify its checksum/schema.

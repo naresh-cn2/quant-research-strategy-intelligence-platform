@@ -10,8 +10,8 @@
     "regression": "pass",
     "adversarial": "pass",
     "acceptance": "pass",
-    "security_bandit": "fail:1",
-    "security_pip_audit": "fail:1"
+    "security_bandit": "pass",
+    "security_pip_audit": "pass"
   },
-  "overall": \"fail\"
+  "overall": \"pass\"
 }
